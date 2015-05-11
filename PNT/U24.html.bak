@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+<style>
+body
+{
+	background-color: rgb(250,250,235);
+	color: rgb(0,0,120);
+	font-family: Verdana;
+	font-size: 12pt;
+	text-decoration: none;
+	font-weight: normal;
+}
+h1
+{
+	color: rgb(0, 120, 0);
+	font-size: 16pt;
+	font-weight: normal;
+}
+h2
+{
+	color: rgb(0, 0, 0);
+	font-size: 8pt;
+	font-weight: normal;
+}
+</style>		
+</head>
+<body>
+<h1>Twenty-Four Help</h1>
+<table>
+	<tr><td><img src="u241.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>The object is to make an equation that equals 24.
+				<li>Each puzzle consists of 4 numbers, all of which must be used.</li>
+				<li>When you have found all the pieces in the maze, the puzzle will light up for you to solve it.</li>
+			</ul></td></tr>
+	<tr><td><img src="u242.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>When you click on a number, its color will change, and it cannot be used again.</li>
+			</ul></td></tr>
+	<tr><td><img src="u243.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>Use the operation buttons and parentheses as needed to make your equation.</li>
+			</ul></td></tr>
+	<tr><td><img src="u244.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>In equations, multiplication and division are performed first, then addition and subtraction.</li>
+				<li>So you might need parentheses if you need addition or subtraction to be done first to make it equal 24.</li>
+			</ul></td></tr>
+	<tr><td><img src="u245.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>When you're ready, click the Submit button to evaluate your equation.</li>
+				<li>If your equation does not equal 24, or is mathematically invalid, you will get a message.</li>
+			</ul></td></tr>
+	<tr><td><img src="u246.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>Use the BackUp button or the Clear button to change your equation.</li>
+				<li>As you remove numbers from the equation, their buttons will light up so they can be used again.</li>
+			</ul></td></tr>
+	<tr><td><img src="u247.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>When you have corrected your entry, click Submit again.</li>
+			</ul></td></tr>
+	<tr><td><img src="u248.JPG" border="1" width="150" height="150"></td>
+			<td><ul>
+				<li>When the puzzle is solved, it will go dark until the next level has been completed.</li>
+				<li>If you're really stuck, here's a good solver online.</li>
+				<li>Triple-click on the link below, Ctrl+C to copy, and then paste into a browser.</li>
+				<li>http://scripts.cac.psu.edu/staff/r/j/rjg5/scripts/Math24.pl
+			</ul></td></tr>
+</table>
+<br><br>
+<h2>ToMarPentathlon is a creation of ToMarGames.</h2>
+</body>
+</html>

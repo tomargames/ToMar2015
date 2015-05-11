@@ -1,0 +1,96 @@
+body
+{
+	background-color: rgb(250,250,235);
+	color: rgb(0,0,80);
+	font-family: calibri;
+	font-size: 10pt;
+	text-decoration: none;
+}
+a
+{
+	text-decoration: none;
+}
+a:hover
+{ 
+  background-color : rgb(250, 250, 235);
+  color: rgb(80,0,0);
+}	
+.fineprint8
+{
+	font-size: 8pt;
+	color: rgb(250,250,235);
+	text-decoration: none;
+	background-color: rgb(0,128,0);
+	text-align: center;
+	font-weight: bold;
+}
+.fineprint10
+{
+	font-size: 10pt;
+	color: rgb(250,250,235);
+	text-decoration: none;
+	background-color: rgb(0,128,0);
+	text-align: center;
+	font-weight: bold;
+}
+.menuselected
+{
+	font-size: 12pt;
+  background-color : #515C72;
+	color: rgb(250,250,235);
+	text-decoration: none;
+	text-align: left;
+}
+.menubutton
+{
+	font-size: 12pt;
+  background-color : rgb(80,0,0);
+	color: rgb(250,250,235);
+	text-decoration: none;
+	text-align: left;
+}
+.banner
+{
+	background-color: rgb(0,128,0);
+	font-size: 48pt;
+	color: rgb(250,250,235);
+	text-align: center;
+	height: 48px;
+}
+.outer 
+{
+    background-color : #515C72;
+    background-image : none;
+    margin : 0px 0px 0px 0px;
+}
+.green32C
+{
+	color: rgb(0,128,0);
+	font-size: 32pt;
+	text-align: center;
+}	
+.green12L
+{
+	color: rgb(0,128,0);
+	font-size: 12pt;
+	text-align: left;
+}	
+.blue12L
+{
+	color: rgb(0,0,128);
+	font-size: 12pt;
+	text-align: left;
+}	
+.darkred24L
+{
+	color: rgb(128,0,0);
+	font-size: 24pt;
+	text-align: left;
+}	
+.blue24L
+{
+	color: rgb(0,0,128);
+	font-size: 24pt;
+	text-align: left;
+}	
+	

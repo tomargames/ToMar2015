@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+<style>
+body
+{
+	background-color: rgb(250,250,235);
+	color: rgb(0,0,120);
+	font-family: Verdana;
+	font-size: 12pt;
+	font-weight: normal;
+	text-decoration: none;
+}
+h1
+{
+	color: rgb(0, 120, 0);
+	font-size: 16pt;
+	font-weight: normal;
+}
+h2
+{
+	color: rgb(0, 0, 0);
+	font-size: 8pt;
+	font-weight: normal;
+}
+</style>		
+</head>
+<body>
+<h1>Pentathlon Maze Help</h1>
+<table>
+	<tr><td><img src="PNT.PNG" border="1" width="250" height="250"></td>
+			<td><h1>ToMar Pentathlon Hall of Fame</h1>
+				<table border=1>
+					<tr><td>Name</td><td>Date</td><td>Highest Level Completed</td></tr>
+					<tr><td>Marie Baldys</td><td>November 30, 2013</td><td>25</td></tr>
+					<tr><td>Peach Merzanis</td><td>December 3, 2013</td><td>24</td></tr>
+			</table></td></tr>
+	<tr><td><img src="maze1a.JPG" border="1" width="250" height="175"></td>
+			<td><ul>
+				<li>Pentathlon consists of 5 puzzles that must be completed for each level.</li>
+				<li>The Maze is the primary driver of game play.</li>
+				<li>When you come into the maze, you cannot see any of the walls.	</li>
+				<li>This panel, on the left, shows a 2D representation of the maze, and shows you where the exit is.</li>
+			</ul></td></tr>
+	<tr>
+			<td><ul>
+				<li>This panel, on the right, shows a 3D representation of the cell that you are currently in.</li>
+				<li>The yellow circle shows you which door you entered through.</li>
+				<li>All doors are visible on the 3D panel.</li>
+				<li>You click the doors, or use the keyboard arrow keys, to navigate through the Maze.</li>
+			</ul></td>
+				<td><img src="maze1b.JPG" border="1" width="250" height="175"></td>
+	</tr>
+	<tr><td><img src="maze2a.JPG" border="1" width="250" height="175"></td>
+			<td><ul>
+				<li>As you move through the maze, each cell you've visited will change color.</li>
+				<li>Each cells "owns" its south and east walls; doors on those walls will be displayed once you've visited it.</li>
+				<li>Doors on the north and west walls can only be seen in the 3D view of the cell you're in, unless the cell that "owns" them has been visited.</li>
+			</ul></td>
+	</tr>
+	<tr>
+			<td><ul>
+				<li>This is the 3D view of the cell above. The letter U has been found, from the Anchors Away game.</li>
+				<li>As you find the pieces in the maze, they will light up in the puzzle they're from. You don't need to click on them.</li>
+				<li>In this view, you can see a door on the west wall.</li>
+				<li>If you compare the 2D view, that door is not displayed because it is "owned" by a cell that hasn't been visited yet.</li>
+			</ul></td>
+			<td><img src="maze2b.JPG" border="1" width="250" height="175"></td>
+	</tr>
+	<tr><td><img src="maze4a.JPG" border="1" width="250" height="175"></td>
+			<td><ul>
+				<li>In this 2D view, you can't see that there's a wall to the north, because you haven't been there yet.</li>
+				<li>It looks like there's no wall to the south, and there isn't -- that one you can be sure of.</li>
+				<li>But if you look at the 3D view of the cell (below), you can clearly see that there's no door to the north, but there is one to the south.</li>
+			</ul></td>
+	</tr>
+	<tr>
+			<td><ul>
+				<li>Also, you'll notice two other buttons on this panel next to the HELP button.</li>
+				<li>The GAME HISTORY button will show you past games. The best games are sorted to the top.</li>
+				<li>The NEW GAME button will start a new game. When you come into Pentathlon, you will automatically be at the beginning of the level you were at when you left.</li>
+				<li>If you reach a level that's more taxing than you care to deal with, start a new game! </li>
+			</ul></td>
+			<td><img src="maze4b.JPG" border="1" width="250" height="175"></td>
+	</tr>
+	<tr><td><img src="maze3a.JPG" border="1" width="250" height="175"></td>
+			<td><ul>
+				<li>When you reach the Exit, the Maze has been solved.</li>
+				<li>Solving a puzzle will cause the walls of the maze to become visible.</li>
+				<li>The door to the Exit will not appear until all the puzzles in the level have been solved.</li>
+			</ul></td>
+	</tr>
+	<tr>
+			<td><ul>
+				<li>If all the puzzles haven't been solved yet, you can't exit.</li>
+				<li>Now that the walls are visible, navigate the maze to search for other puzzle pieces.</li>
+			</ul></td>
+			<td><img src="maze3b.JPG" border="1" width="250" height="175"></td>
+	</tr>
+	<tr>
+			<td><img src="maze5a.JPG" border="1" width="250" height="175"></td>
+			<td><ul>
+				<li>When you have all the pieces to a puzzle, it will light up and ask to be solved.</li>
+				<li>You don't have to solve it right away, but if you do, and there are game pieces you haven't found yet, you will be shown where some of them are.</li>
+				<li>Each time you solve a puzzle, you'll be shown the whereabouts of unfound pieces to the next puzzle.</li>
+				<li>When you've solved all the puzzles, you'll be told to head for the Maze Exit.</li>
+			</ul></td>
+		</tr>
+	<tr>
+			<td><ul>
+				<li>Once all the puzzles have been solved, a door will appear to the next level.</li>
+				<li>Click on the door, or use the arrow keys, to move to the next level.</li>
+				<li>There are a possible 27 levels, but usually less, depending on Same Difference.</li>
+				<li>The game is saved at the beginning of each level, so if you close the application, when you restart it, you will be at the beginning of the level.</li>
+				<li>The two files that are written to save the game are tmPentathlonSave.txt and tmPentathlonGames.txt.
+			</ul></td>
+			<td><img src="maze5b.JPG" border="1" width="250" height="175"></td>
+	</tr>
+</table>
+<br><br>
+<h2>ToMarPentathlon is a creation of ToMarGames.</h2>
+<h2>www.tomargames.com</h2>
+</body>
+</html>

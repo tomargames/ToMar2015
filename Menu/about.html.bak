@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="en">   
+<meta charset="utf-8">   
+<head>	
+	<title>ToMarGames</title>
+	<LINK REL="StyleSheet" HREF="menu.css?"  TYPE="text/css" TITLE="ToMar Style" MEDIA="screen">
+</head>	
+<body>
+<table width=100% cellpadding="0" cellspacing="0"><tr>
+<td width=20% class="outer"></td>
+<td width=60%>
+	<table width=100% cellpadding=0 cellspacing=0>
+	<tr>
+		<td class="fineprint10" width="20%"><a class=fineprint8 href="../Menu">MENU</a></td>
+		<td class="banner" width="60%">ToMarGames</td>
+		<td class="fineprint10" width="20%"><a class="coinbase-button" data-code="00732638e22fdc666879c182753a7910" data-button-style="donation_small" href="https://coinbase.com/checkouts/00732638e22fdc666879c182753a7910">Donate Bitcoins</a><script src="https://coinbase.com/assets/button.js" type="text/javascript"></script></td>
+	</tr>
+	<tr><td colspan=3>
+		<p class=green32C>About ToMarGames</p>
+		<p class=blue12L>
+			&nbsp; ToMarGames is Tom and Marie.
+			<br><br>
+			&nbsp; We got married in 1976, and started writing computer games when we got our first computer, in 1981. Our first games were in Basic on a TI 99/4A computer that had 16K, hooked up to our TV set, and used a cassette player for storage. 
+			<br><br>
+			&nbsp; A few years later, we got an IBM PC Junior with 256K, and switched to True Basic. The games got a little more sophisticated.
+			<br><br>
+			&nbsp; As our computers got more powerful, we switched to the C programming language, and started putting our games on computer bulletin boards.  			
+			<br><br>
+			&nbsp; Then we had kids, and did that for a while, but when the internet started happening, Marie found she missed coding, so Tom set her up with a java environment, got her a book to start learning, and the games started happening again. We acquired the ToMarGames domain in 2001, and we've been here ever since!			
+			<br><br>
+			&nbsp; Fast-forward to April 15, 2015, when browsers stopped allowing Java applets to run without a whole lot of money and bureacracy being involved. Five days later, on April 20, 2015, Google stopped supporting the OpenID authentication we were using. So here we are in 2015, slowly rebuilding. I've converted one (1) game to HTML5, but I can't even put it up until I get the site authentication fixed. I'll keep you posted...
+			<br><br>
+			&nbsp; Tom is the computer whiz, Marie is the coder, and together we are ToMarGames. We hope you enjoy playing the games as much as we enjoy creating them!
+			<br><br>
+			&nbsp; You can also find us in the Google Play Store -- we have games for <a href="android.html">Android!</a>
+			<br><br>
+			&nbsp; You can contact us by <a href="mailto:tomargames@gmail.com" target="_top">email</a>.
+		</p>	
+	</td></tr>	
+	<tr>
+		<td class="fineprint8" width="20%"></td>
+		<td class="fineprint8" width="60%">ToMarGames build brain cells!<br>Copyright &copy; 2015 ToMarGames<br>No rights reserved; feel free to use as you like.<br><?php echo $_SERVER['REMOTE_ADDR'] ?></td>
+		<td class="fineprint8" width="20%"></td>
+	</tr>
+	</table>
+</td>				
+<td width=20% class="outer"></td></tr></table>			

@@ -1,0 +1,223 @@
+// Create the canvas
+var canvas = document.getElementById("dbCanvas");
+var ctx = canvas.getContext("2d");
+canvas.width = 800;
+canvas.height = 600;
+canvas.addEventListener("mousemove", mouseMove);
+canvas.addEventListener("click", startGame);
+
+// objBall constructor
+function objBall(good) 
+{
+	this.x = getIntRnd(canvas.width - 50) + 20;
+	this.speed = getIntRnd(3) + 1;
+	this.size = getIntRnd(10) + 10;
+	this.dx = getIntRnd(4) + 1;
+	this.dy = getIntRnd(3) + 1;
+	this.y = 10;
+	if (getIntRnd(2) === 0)
+	{
+		this.dx *= -1;
+	}
+	if (good === true)
+	{
+		this.color = getColorDARKGREEN();
+		this.pointValue = (intRedCount + 1) * this.speed * (25 - this.size);
+	}
+	else
+	{
+		intRedCount += 1;
+		this.pointValue = 0;
+		this.color = getColorRED();
+	}
+	this.draw = function() 
+	{
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, this.size, 0, 2*Math.PI);
+		ctx.fillStyle = this.color;
+		ctx.fill();
+	}
+	this.move = function()
+	{
+		this.x += this.dx * this.speed;
+		this.y += this.dy * this.speed;
+		if (this.x < this.size || this.x + this.size > canvas.width)
+		{
+			this.dx *= -1;
+			this.x = (this.x < this.size) ? this.size : canvas.width - this.size; 
+		}
+		else if (this.y < this.size || this.y + this.size > canvas.height)
+		{
+			this.dy *= -1;
+			this.y = (this.y < this.size) ? this.size : canvas.height - this.size; 
+		}
+	}
+	this.hit = function()
+	{
+		if (currentX >= this.x && currentX <= this.x + this.size)
+		{
+			if (currentY >= this.y && currentY <= this.y + this.size)
+			{
+				return true;	
+			}
+		}
+		return false;
+	}
+	this.display = function(msg)
+	{
+		console.log(msg + " x=" + this.x + ", y="+ this.y + ", speed=" + this.speed + ", size=" + this.size);
+	}	
+}
+function startGame(event)
+{
+	if (intGameStage !== intPLAYING)
+	{
+		intPoints = 0;
+		intRedCount = 0;
+		goodBalls = [];
+		badBalls = [];
+		intGoodTime = 2000;
+		intBadTime = 10000;
+		intThreshold = 100;
+		intMaxBad = 1;
+		intGameStage = intPLAYING;
+		intStartTime = intPrevGood = intPrevBad = Date.now();
+		goodBalls.push(new objBall(true));
+	}		
+}	
+function mouseMove(event)
+{
+	var rect = canvas.getBoundingClientRect();
+	currentX = event.clientX - rect.left;
+	currentY = event.clientY - rect.top;
+//console.log("x = " + currentX + ", y = " + currentY);
+	for (b in goodBalls)
+	{
+		if (goodBalls[b].hit())
+		{
+			intPoints += goodBalls[b].pointValue;
+			goodBalls.splice(b, 1);
+			break;
+		} 
+	}
+}
+// Game objects
+var intRedCount;
+var intPoints;
+var goodBalls;
+var badBalls;
+var currentX;
+var currentY;
+var intGoodTime;
+var intBadTime;
+var intThreshold;
+var intMaxBad;
+var intStartTime;
+var intPrevGood;
+var intPrevBad;
+var intNOTSTARTED = 0;
+var intPLAYING = 1;
+var intGAMEOVER = 2;
+var intGameStage = intNOTSTARTED;
+
+// Draw everything
+function render() 
+{
+	ctx.fillStyle = getColorCREAM();
+	ctx.fillRect(0,0,canvas.width,canvas.height);
+	if (intGameStage === intPLAYING)
+	{
+		for (b in goodBalls)
+		{
+			goodBalls[b].draw();
+		}
+		for (b in badBalls)
+		{
+			badBalls[b].draw();
+		}
+		printText("Score: " + intPoints, 10, 35, getColorPURPLE());
+	}	
+	else if (intGameStage === intGAMEOVER)
+	{
+		printText("*** GAME OVER ***", 80, 10, getColorPURPLE());
+		printText("Score: " + intPoints, 80, 110, getColorPURPLE());
+		printText("Click to play again!", 80, 210, getColorPURPLE());
+	}	
+	else
+	{
+		printText(stringMessage, 30, 90, getColorPURPLE());
+		printText("Catch the green balls; avoid the red balls.", 30, 190, getColorPURPLE());
+		printText("Click inside this box to start a new game...", 30, 290, getColorPURPLE());
+	}	
+	lastRendered = Date.now();
+}
+function printText(string, x, y, color)
+{
+	ctx.font = "24px Arial";
+	ctx.textAlign = "left";
+	ctx.textBaseline = "top";
+	ctx.fillStyle = color;
+	ctx.fillText(string, x, y);
+}
+// The main game loop
+function main() 
+{
+	if (Date.now() - lastRendered > 25)
+	{
+		if (intGameStage !== intPLAYING)
+		{
+			render();
+		}	
+		else 
+		{
+			var secs = Date.now();
+			if ((secs - intPrevGood) > intGoodTime)
+			{
+				goodBalls.push(new objBall(true));
+				intPrevGood = secs;
+				intGoodTime = (intGoodTime > 1500) ? intGoodTime - 500 : intGoodTime + 5;
+			}	
+			if ((secs - intPrevBad) > intBadTime && badBalls.length < intMaxBad)
+			{
+				badBalls.push(new objBall(false));
+				intPrevBad = secs;
+			}	
+			for (b in goodBalls)
+			{
+				goodBalls[b].move();
+				if (goodBalls[b].hit())
+				{
+					intPoints += goodBalls[b].pointValue;
+					goodBalls.splice(b, 1);
+				} 
+			}
+			for (b in badBalls)
+			{
+				badBalls[b].move();
+				if (badBalls[b].hit())
+				{
+					intGameStage = intGAMEOVER;
+					document.gameForm.score.value = intPoints;
+					document.gameForm.tsp.value = Date.now();
+					document.gameForm.submit();
+				} 
+			}
+			if (intPoints > intThreshold)
+			{
+				intMaxBad += 1;
+				intThreshold = (intThreshold < 10000) ? intThreshold * 2 : intThreshold + 5000;
+			}
+			render();
+		}	
+	}
+	// Request to do this again ASAP
+	requestAnimationFrame(main);
+};
+
+// Cross-browser support for requestAnimationFrame
+var w = window;
+requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+
+// Let's play this game!
+var lastRendered = Date.now();
+main();

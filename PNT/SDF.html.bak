@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<style>
+body
+{
+	background-color: rgb(250,250,235);
+	color: rgb(0,0,120);
+	font-family: Verdana;
+	font-size: 12pt;
+	text-decoration: none;
+	font-weight: normal;
+}
+h1
+{
+	color: rgb(0, 120, 0);
+	font-size: 16pt;
+	font-weight: normal;
+}
+h2
+{
+	color: rgb(0, 0, 0);
+	font-size: 8pt;
+	font-weight: normal;
+}
+td
+{
+	color: rgb(120, 0, 0);
+	font-size: 10pt;
+	font-weight: normal;
+}
+</style>		
+</head>
+<body>
+<h1>SameDifference Help</h1>
+
+<br>Each level, you will click on 3 cards that form a set.
+<br>Cards each have 4 characteristics.
+<br>The cards need to be all the same or all different for each characteristic.
+<br>If two of the cards are the same color, the third must be the same color.
+<br>All three must either be the same number, or all different numbers.
+<br>The shading must be either all the same or all different.
+
+	<table width="50%" valign="top">
+	<tr valign="top">
+	<td width="25%">
+		<b>Colors</b><br>
+			Red<br>
+			Blue<br>
+			Black
+	</td>
+	<td width="25%">
+		<b>Shapes</b><br>
+			Circles<br>
+			Squares<br>
+			Triangles
+	</td>
+	<td width="25%">
+		<b>Shading</b><br>
+			Solid<br>
+			Empty<br>
+			Dot in the middle
+	</td>
+	<td width="25%">
+		<b>Number</b><br>
+			1<br>
+			2<br>
+			3
+	</td>
+	</tr>
+</table>
+
+
+<br>Valid set: 1 green clear triangle, 2 green solid squares, 3 green dotted circles
+<br>Valid set: 2 red solid circles, 2 green solid circles, 2 purple solid circles
+<br>Valid set: 3 red clear triangle, 3 red clear squares, 3 red clear circles
+<br><br>
+<h2>ToMarPentathlon is a creation of ToMarGames © 2013 Some rights reserved</h2>
+</body>
+</html>

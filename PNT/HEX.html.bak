@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<style>
+body
+{
+	background-color: rgb(250,250,235);
+	color: rgb(0,0,120);
+	font-family: Verdana;
+	font-size: 12pt;
+	font-weight: normal;
+	text-decoration: none;
+}
+h1
+{
+	color: rgb(0, 120, 0);
+	font-size: 16pt;
+	font-weight: normal;
+}
+h2
+{
+	color: rgb(0, 0, 0);
+	font-size: 8pt;
+	font-weight: normal;
+}
+</style>		
+</head>
+<body>
+<h1>AlphabetSoup Help</h1>
+
+<br>This game uses the alphabet to exercise and stretch your brain.
+<br>
+<br>Each puzzle will be letters placed in random positions on the board.
+<br>
+<br>Memorize the positions of the letters in the layout.
+<br>
+<br>When you click READY, the letters will disappear, but the boxes that held them will remain.
+<br>
+<br>Click on the boxes in alphabetical order to recreate the puzzle.
+<br>
+<br>If you make a mistake, you will be prompted to try again.
+<br><br>
+<h2>ToMarPentathlon is a creation of ToMarGames © 2013 Some rights reserved</h2>
+</body>
+</html>
