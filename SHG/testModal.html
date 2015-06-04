@@ -1,0 +1,24 @@
+<html>
+ <head>
+ <script type="text/javascript">
+ function showModal()
+ {
+ var obj = [{"name":"tutorials2learn","url":"http://www.tutorials2learn.com"}, {"name":"sampleName","url":"http://www.sampleURL.com"}, {"name":"sampleName2","url":"http://www.sampleURL2.com"},{"name":"sampleName3","url":"http://www.sampleURL3.com"}] // Object to be sent the modal dialog
+var dialogWin = window.showModalDialog('modal.html',
+ obj, "dialogwidth: 450px; dialogheight: 300px; resizable: yes"); // Showing the Modal Dialog
+// Below Part will be executed after the dialog window is closed.
+ document.getElementById('name').innerHTML = dialogWin.name;
+ document.getElementById('url').innerHTML = dialogWin.url;
+ document.getElementById('dynText').innerHTML = 'Returned Values are:';
+ }
+ </script>
+</head>
+ <body >
+ <p id="dynText" >Sending Object: <em>[{"name":"tutorials2learn","url":"http://www.tutorials2learn.com"}, {"name":"sampleName","url":"http://www.sampleURL.com"}, {"name":"sampleName2","url":"http://www.sampleURL2.com"},{"name":"sampleName3","url":"http://www.sampleURL3.com"}]</em></p>
+ <p>
+ Name: <em id="name"></em><br>
+ Url: <em id="url"></em>
+ </p>
+ <a href="#" onclick="showModal();" >Show Modal</a>
+</body>
+ </html>

@@ -1,0 +1,31 @@
+<html>
+ <head>
+<script type="text/javascript">
+ // generate Select Box with values received from the parent window.
+ function genOptions(){
+ var opts = window.dialogArguments;
+ var selBox = document.getElementById('selOpt');
+ for(var i =0;i<opts.length;i++){
+ selBox.options[i] = new Option(opts[i].name,opts[i].url);
+ }
+ }
+ // Send the selected Values as an Object to the parent window.
+ function sendValues(){
+ var selBox = document.getElementById('selOpt');
+ sendObj = {name:selBox.options[selBox.selectedIndex].text,url:selBox.value};
+ window.returnValue = sendObj;
+ window.close();
+ }
+ </script>
+</head>
+ <body  >
+ <p>choose your option:<br >
+ <select id="selOpt">
+</select>
+ </p>
+ <a href="#" onclick="sendValues();" >Save</a>
+ <script>
+ genOptions();
+ </script>
+ </body>
+ </html>

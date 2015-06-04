@@ -8,6 +8,10 @@ global $id;
 global $nm;
 $id = $_POST["id"];
 $nm = $_POST["nm"];
+if ($id == "")
+{
+	echo '<script> alert("Sign in to play games. Thanks!"); window.location = "../Menu"; </script>';
+}
 // Step2: read player file and identify player
 $players = PlayerFromXML();
 $player = thisPlayer($id, $nm, $players);
@@ -86,20 +90,18 @@ if (is_finite($sc) && $sc > 0)
 <td width="1">&nbsp; </td>		
 <td>
 <div id="app"> 
-	<canvas id="dbCanvas" width="800" height="600" style="border:5px solid #ff0000;">
+	<canvas id="dbCanvas" width="800" height="600" style="border:5px solid #ff0000; cursor:crosshair;">
 		Your browser does not support the canvas element.
 	</canvas>
 	<script>
 <?php
-	echo "var stringPlayerId = '".$id."'; ";
-	echo "var stringPlayerName = '".$nm."'; ";
 	if ("NONE" !== $message)
 	{
 		echo "var stringMessage = '".$message."'; ";
 	}
 	else	
 	{
-		echo "var stringMessage = 'Welcome to DodgeBall, ".$nm."!'; ";
+		echo "var stringMessage = 'Welcome to DodgeBall!'; ";
 	}
 ?>		
 	</script>

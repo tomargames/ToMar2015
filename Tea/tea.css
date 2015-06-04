@@ -1,0 +1,91 @@
+body
+{
+	background-color: rgb(192,168,132);
+	color: rgb(0,0,120);
+	font-family: verdana;
+	font-size: 10pt;
+	text-decoration: none;
+}
+.eBtn
+{
+	width: 15px;
+	height: 15px;
+	background-color: rgb(150,126,90);
+}	
+.sBtn
+{
+	width: 20px;
+	height: 20px;
+	background-color: rgb(150,126,90);
+}	
+.biggest
+{
+	color: rgb(0,0,0);
+	font-size: 18pt;
+	text-align: center;
+}
+.black12
+{
+	color: rgb(0,0,0);
+	font-size: 12pt;
+	text-align: left;
+	text-decoration: none;
+}
+.black10
+{
+	color: rgb(0,0,0);
+	font-size: 10pt;
+	text-align: left;
+	text-decoration: none;
+}
+.black10num
+{
+	color: rgb(0,0,0);
+	font-size: 10pt;
+	text-align: right;
+	text-decoration: none;
+}
+.blue12
+{
+	color: rgb(0,0,80);
+	font-size: 12pt;
+	text-align: left;
+	text-decoration: none;
+}
+.blue10
+{
+	color: rgb(0,0,80);
+	font-size: 10pt;
+	text-align: left;
+	text-decoration: none;
+}
+.green12
+{
+	color: rgb(0,80,0);
+	font-size: 12pt;
+	text-align: left;
+	text-decoration: none;
+}
+.green10
+{
+	color: rgb(0,80,0);
+	font-size: 10pt;
+	text-align: left;
+	text-decoration: none;
+}
+.magenta12
+{
+	color: rgb(100,0,100);
+	font-size: 12pt;
+	text-align: left;
+	text-decoration: none;
+}
+.magenta10
+{
+	color: rgb(100,0,100);
+	font-size: 10pt;
+	text-align: right;
+	text-decoration: none;
+}
+
+		

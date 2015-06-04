@@ -1,5 +1,28 @@
+// this function will return both 0 and max, so there are (max + 1) possibilities
 var getIntRnd = function (max) {return Math.round(Math.random() * max)};
 
+
+// use with a filter: var newArray = oldArray.filter(onlyUnique)
+function onlyUnique(value, index, self) 
+{ 
+    return self.indexOf(value) === index;
+}
+// use with a filter: var newArray = oldArray.filter(removeDeleted)
+function removeDeleted(value) 
+{ 
+    return value !== undefined;
+}
+
+function formatNumber(num, dig)			// pads with leading zeroes
+{
+	var temp = 	"000000000" + num;
+	return temp.substring(temp.length - dig);
+}
+function setLength(num, dig)				// pads with leading spaces
+{
+	var temp = 	"        " + num;
+	return temp.substring(temp.length - dig);
+}
 function changeUser()
 {
 	document.cookie = "name=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
@@ -92,3 +115,43 @@ var getColorPALEGRAY = function( ) {return "rgb (225,225,225)"};
 var getColorOFFWHITE = function( ) {return "rgb (227,247,255)"};
 var getColorDARKCYAN = function( ) {return "rgb (0,170,204)"};
 var getColorDARKMAGENTA = function( ) {return "rgb (128,0,128)"};
+
+function tmButton(x, y, color, width, height, label, size)
+{
+	this.x = x;
+	this.y = y;
+	this.color = color;
+	this.width = width;
+	this.height = height;
+	this.label = label;
+	this.xLabel = 10;
+	this.yLabel = 10;
+	this.font = size + "px Arial";
+	this.textColor = getColorBLACK();
+	this.clicked = function(mouseX, mouseY)
+	{
+		if (mouseX > this.x && 
+			mouseX < this.x + this.width && 
+			mouseY > this.y && 
+			mouseY < this.y + this.height)
+		{
+			return true;
+		}
+		return false;
+	}
+	this.draw = function()
+	{
+		ctx.fillStyle = this.color;
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.beginPath();
+		ctx.lineWidth = "1";
+		ctx.strokeStyle = this.textColor;
+		ctx.rect(this.x, this.y, this.width, this.height);
+		ctx.stroke();			
+   	ctx.font = this.font;
+		ctx.textAlign = "left";
+		ctx.textBaseline = "top";
+		ctx.fillStyle = this.textColor;
+		ctx.fillText(this.label, this.x + this.xLabel, this.y + this.yLabel);
+	}	
+}

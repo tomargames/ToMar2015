@@ -1,0 +1,4 @@
+<?php
+require 'teaDO.php';
+$TeaDate = processDates(createDates());
+?>

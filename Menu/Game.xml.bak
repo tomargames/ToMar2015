@@ -1,16 +1,4 @@
 <?xml version='1.0' encoding='ISO-8859-1'?><root>
 <Game><ID>SHG</ID><Type>SJ</Type><Name>Shanghai</Name><Desc>A solitaire game of deep meditation, with some very important people. Take as long as you like; relaxation is the goal.</Desc></Game>
-<Game><ID>U24</ID><Type>FL</Type><Name>Ultimate24</Name><Desc>Use all 4 numbers, operational signs, and parentheses to make an expression that equals 24. Solve as many as you can in three minutes.</Desc></Game>
-<Game><ID>SDF</ID><Type>FL</Type><Name>SameDifference</Name><Desc>Find sets where each of 4 characteristics is either all the same... or different. Find as many as you can in three minutes.</Desc></Game>
-<Game><ID>SUD</ID><Type>SL</Type><Name>Sudoku</Name><Desc>Play Sudoku with as much or as little help as you need. Highlighting helps you sharpen your focus, and time is not a factor.</Desc></Game>
-<Game><ID>RUN</ID><Type>SL</Type><Name>Runes</Name><Desc>Match characters and colors. Levels get progressively more difficult, and there are many, many levels. Time is not a factor.</Desc></Game>
-<Game><ID>WDQ</ID><Type>FW</Type><Name>WordQuest</Name><Desc>WordQuest is a maze, and a treasure hunt, and a word game! There is also a clock running, so watch out for the bandits!</Desc></Game>
-<Game><ID>HTR</ID><Type>FJ</Type><Name>HappyTrails</Name><Desc>Use the keyboard to gobble up the green guys and lengthen your trail. Do not hit the red guys, or the walls, or your trail.</Desc></Game>
-<Game><ID>BND</ID><Type>FW</Type><Name>BoonDoggle</Name><Desc>Click on adjacent letters dropped into the honeycomb to form words. Make as many words as you can before the board is full.</Desc></Game>
-<Game><ID>WDM</ID><Type>FW</Type><Name>WordMania</Name><Desc>Find all the 3-, 4-, 5-, and 6-letter words you can make from six letters. Make as many words as you can in three minutes.</Desc></Game>
-<Game><ID>AAA</ID><Type>FW</Type><Name>AnchorsAway</Name><Desc>Each word has anchors and blanks. Use the letters in the pool to fill in the blanks and make words. Build more words every level.</Desc></Game>
-<Game><ID>BLN</ID><Type>SJ</Type><Name>Ballooney</Name><Desc>Pop balloons if two or more of the same color touch. Take your time and pop lots of balloons. Clearing the board takes you to new levels.</Desc></Game>
 <Game><ID>DBL</ID><Type>FJ</Type><Name>DodgeBall</Name><Desc>Fast-paced and fun! Catch the green balls with your mouse, while avoiding the red balls. No clicking!</Desc></Game>
-<Game><ID>HEX</ID><Type>SJ</Type><Name>AlphabetMaze</Name><Desc>This is a workout for your short-term memory. Recreate each puzzle in alphabetical order. Take as long as you like; time is not a factor.</Desc></Game>
-<Game><ID>PRF</ID><Type>FL</Type><Name>PrimalFactors</Name><Desc>Miranda loves this game, so it is here.</Desc></Game>
 </root>

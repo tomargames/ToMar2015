@@ -5,12 +5,13 @@ canvas.width = 800;
 canvas.height = 600;
 canvas.addEventListener("mousemove", mouseMove);
 canvas.addEventListener("click", startGame);
+var refreshMilliseconds = 30;
 
 // objBall constructor
 function objBall(good) 
 {
 	this.x = getIntRnd(canvas.width - 50) + 20;
-	this.speed = getIntRnd(3) + 1;
+	this.speed = getIntRnd(4) + 1;
 	this.size = getIntRnd(10) + 10;
 	this.dx = getIntRnd(4) + 1;
 	this.dy = getIntRnd(3) + 1;
@@ -101,6 +102,14 @@ function mouseMove(event)
 		} 
 	}
 }
+function printText(string, x, y, color)
+{
+	ctx.font = "24px Arial";
+	ctx.textAlign = "left";
+	ctx.textBaseline = "top";
+	ctx.fillStyle = color;
+	ctx.fillText(string, x, y);
+}
 // Game objects
 var intRedCount;
 var intPoints;
@@ -115,6 +124,7 @@ var intMaxBad;
 var intStartTime;
 var intPrevGood;
 var intPrevBad;
+var intPrevMove;
 var intNOTSTARTED = 0;
 var intPLAYING = 1;
 var intGAMEOVER = 2;
@@ -139,9 +149,8 @@ function render()
 	}	
 	else if (intGameStage === intGAMEOVER)
 	{
-		printText("*** GAME OVER ***", 80, 10, getColorPURPLE());
-		printText("Score: " + intPoints, 80, 110, getColorPURPLE());
-		printText("Click to play again!", 80, 210, getColorPURPLE());
+		printText("*** GAME OVER ***", 30, 90, getColorPURPLE());
+		printText("Score: " + intPoints, 30, 190, getColorPURPLE());
 	}	
 	else
 	{
@@ -151,37 +160,20 @@ function render()
 	}	
 	lastRendered = Date.now();
 }
-function printText(string, x, y, color)
-{
-	ctx.font = "24px Arial";
-	ctx.textAlign = "left";
-	ctx.textBaseline = "top";
-	ctx.fillStyle = color;
-	ctx.fillText(string, x, y);
-}
 // The main game loop
 function main() 
 {
-	if (Date.now() - lastRendered > 25)
+	var secs = Date.now()
+	if (intGameStage === intPLAYING)
 	{
-		if (intGameStage !== intPLAYING)
+		if ((secs - intPrevGood) > intGoodTime)
 		{
-			render();
+			goodBalls.push(new objBall(true));
+			intPrevGood = secs;
+			intGoodTime = (intGoodTime > 1500) ? intGoodTime - 500 : intGoodTime + 5;
 		}	
-		else 
+		if ((secs - intPrevMove) > refreshMilliseconds)
 		{
-			var secs = Date.now();
-			if ((secs - intPrevGood) > intGoodTime)
-			{
-				goodBalls.push(new objBall(true));
-				intPrevGood = secs;
-				intGoodTime = (intGoodTime > 1500) ? intGoodTime - 500 : intGoodTime + 5;
-			}	
-			if ((secs - intPrevBad) > intBadTime && badBalls.length < intMaxBad)
-			{
-				badBalls.push(new objBall(false));
-				intPrevBad = secs;
-			}	
 			for (b in goodBalls)
 			{
 				goodBalls[b].move();
@@ -202,14 +194,20 @@ function main()
 					document.gameForm.submit();
 				} 
 			}
-			if (intPoints > intThreshold)
-			{
-				intMaxBad += 1;
-				intThreshold = (intThreshold < 10000) ? intThreshold * 2 : intThreshold + 5000;
-			}
-			render();
+			intPrevMove = secs;
 		}	
+		if ((secs - intPrevBad) > intBadTime && badBalls.length < intMaxBad)
+		{
+			badBalls.push(new objBall(false));
+			intPrevBad = secs;
+		}	
+		if (intPoints > intThreshold)
+		{
+			intMaxBad += 1;
+			intThreshold = (intThreshold < 10000) ? intThreshold * 2 : intThreshold + 5000;
+		}
 	}
+	render();
 	// Request to do this again ASAP
 	requestAnimationFrame(main);
 };
@@ -219,5 +217,5 @@ var w = window;
 requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 
 // Let's play this game!
-var lastRendered = Date.now();
+var lastRendered = intPrevMove = Date.now();
 main();

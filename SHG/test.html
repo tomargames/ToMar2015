@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+	<title>Shanghai</title>
+	<script src="../js/utils.js"></script>
+	<LINK REL="StyleSheet" HREF="../styles.css?19417"  TYPE="text/css" TITLE="ToMar Style" MEDIA="screen">
+</head>
+<body>
+<table border=0 align="center"><tr>	
+	<td width="10%"><img src="SHG.jpg" height="100" width="100"></td>
+	<td  width="80%" class="biggest">Shanghai<br><span class="magenta10">by ToMarGames</span><br></td>
+	<td width="10%"><img src="SHG.jpg" height="100" width="100"></td></tr>
+</table>
+<table border="0" align="center"><tr>
+<td width="30%" align="left">
+<table border=2>
+<tr><td class=green12>Player</td><td class=big>marie baldys</td></tr><tr><td class=green12>Rank</td><td class=big>1</td></tr><tr><td class=green12>Progress</td><td class=big>* * </td></tr><tr><td class=magenta8 colspan=2>Highest: 1444<br>Average: 342<br>StdDev: 243<br></td></tr></table>
+<br><br>
+<form name="menuForm" action="../" method="post">			
+<input type="hidden" name="id" value="106932376942135580175">
+<input type="hidden" name="nm" value="marie baldys">
+<input type="submit" value="ToMarGames Menu"><br><br>	
+</form>
+<form name="gameForm" action="../DBL/" method="post">			
+<input type="hidden" name="id" value="106932376942135580175">
+<input type="hidden" name="nm" value="marie baldys">
+<input type="hidden" name="score">
+<input type="hidden" name="tsp">
+</form>
+<table border=1>
+	<tr><td colspan="3" class="magentah">Players</td></tr>
+	<tr><td class="greenh">Name</td><td class="greenh">Rank</td><td class="greenh">Games</td></tr>
+<tr><td class='green10'>marie baldys</td><td class='green10num'>329</td><td class='green10num'>878</td></tr><tr><td class='green10'>A Parker</td><td class='green10num'>55</td><td class='green10num'>88</td></tr><tr><td class='green10'>dee Holland-Vogt</td><td class='green10num'>49</td><td class='green10num'>54</td></tr><tr><td class='green10'>JFloyd</td><td class='green10num'>21</td><td class='green10num'>36</td></tr><tr><td class='green10'>j merzanis</td><td class='green10num'>19</td><td class='green10num'>21</td></tr><tr><td class='green10'>walkaboutfarm1</td><td class='green10num'>8</td><td class='green10num'>14</td></tr><tr><td class='green10'>Miranda Baldys</td><td class='green10num'>3</td><td class='green10num'>3</td></tr><tr><td class='green10'>Audrey Ulsh</td><td class='green10num'>2</td><td class='green10num'>2</td></tr><tr><td class='green10'>Bernadette Theurer-Rhodes</td><td class='green10num'>1</td><td class='green10num'>1</td></tr><tr><td class='green10'>Aaron Winborn</td><td class='green10num'>1</td><td class='green10num'>1</td></tr>	
+</table>	
+</td>
+<td width="1">&nbsp; </td>		
+<td>
+<div id="app"> 
+	<canvas id="dbCanvas" width="1200" height="650">
+		Your browser does not support the canvas element.
+	</canvas>
+	<script>
+var stringMessage = 'Welcome to Shanghai. Scroll to the right for help functions.'; var tileReady = []; var tileImage = []; tileReady['A'] = false; tileImage['A'] = new Image(); tileImage['A'].onload = function () { tileReady['A'] = true; }; tileImage['A'].src = 'Images/Greg.jpg'; tileReady['B'] = false; tileImage['B'] = new Image(); tileImage['B'].onload = function () { tileReady['B'] = true; }; tileImage['B'].src = 'Images/Norma.jpg'; tileReady['C'] = false; tileImage['C'] = new Image(); tileImage['C'].onload = function () { tileReady['C'] = true; }; tileImage['C'].src = 'Images/MarkG.jpg'; tileReady['D'] = false; tileImage['D'] = new Image(); tileImage['D'].onload = function () { tileReady['D'] = true; }; tileImage['D'].src = 'Images/LisaF.jpg'; tileReady['E'] = false; tileImage['E'] = new Image(); tileImage['E'].onload = function () { tileReady['E'] = true; }; tileImage['E'].src = 'Images/Miranda.jpg'; tileReady['F'] = false; tileImage['F'] = new Image(); tileImage['F'].onload = function () { tileReady['F'] = true; }; tileImage['F'].src = 'Images/WoodyW.jpg'; tileReady['G'] = false; tileImage['G'] = new Image(); tileImage['G'].onload = function () { tileReady['G'] = true; }; tileImage['G'].src = 'Images/Angelyn.jpg'; tileReady['H'] = false; tileImage['H'] = new Image(); tileImage['H'].onload = function () { tileReady['H'] = true; }; tileImage['H'].src = 'Images/AudreyU.jpg'; tileReady['I'] = false; tileImage['I'] = new Image(); tileImage['I'].onload = function () { tileReady['I'] = true; }; tileImage['I'].src = 'Images/Bumba.jpg'; tileReady['J'] = false; tileImage['J'] = new Image(); tileImage['J'].onload = function () { tileReady['J'] = true; }; tileImage['J'].src = 'Images/Clare.jpg'; tileReady['K'] = false; tileImage['K'] = new Image(); tileImage['K'].onload = function () { tileReady['K'] = true; }; tileImage['K'].src = 'Images/AaronT.jpg'; tileReady['L'] = false; tileImage['L'] = new Image(); tileImage['L'].onload = function () { tileReady['L'] = true; }; tileImage['L'].src = 'Images/AaronW.jpg'; tileReady['M'] = false; tileImage['M'] = new Image(); tileImage['M'].onload = function () { tileReady['M'] = true; }; tileImage['M'].src = 'Images/KatieB.jpg'; tileReady['N'] = false; tileImage['N'] = new Image(); tileImage['N'].onload = function () { tileReady['N'] = true; }; tileImage['N'].src = 'Images/Jackie.jpg'; tileReady['O'] = false; tileImage['O'] = new Image(); tileImage['O'].onload = function () { tileReady['O'] = true; }; tileImage['O'].src = 'Images/Ashley.jpg'; tileReady['P'] = false; tileImage['P'] = new Image(); tileImage['P'].onload = function () { tileReady['P'] = true; }; tileImage['P'].src = 'Images/Eli.jpg'; tileReady['Q'] = false; tileImage['Q'] = new Image(); tileImage['Q'].onload = function () { tileReady['Q'] = true; }; tileImage['Q'].src = 'Images/ScottI.jpg'; tileReady['R'] = false; tileImage['R'] = new Image(); tileImage['R'].onload = function () { tileReady['R'] = true; }; tileImage['R'].src = 'Images/Eddy.jpg'; tileReady['S'] = false; tileImage['S'] = new Image(); tileImage['S'].onload = function () { tileReady['S'] = true; }; tileImage['S'].src = 'Images/Mom.jpg'; tileReady['T'] = false; tileImage['T'] = new Image(); tileImage['T'].onload = function () { tileReady['T'] = true; }; tileImage['T'].src = 'Images/Peach.jpg'; tileReady['U'] = false; tileImage['U'] = new Image(); tileImage['U'].onload = function () { tileReady['U'] = true; }; tileImage['U'].src = 'Images/AlexB.jpg'; tileReady['V'] = false; tileImage['V'] = new Image(); tileImage['V'].onload = function () { tileReady['V'] = true; }; tileImage['V'].src = 'Images/Alexis.jpg'; tileReady['W'] = false; tileImage['W'] = new Image(); tileImage['W'].onload = function () { tileReady['W'] = true; }; tileImage['W'].src = 'Images/AlexG.jpg'; tileReady['X'] = false; tileImage['X'] = new Image(); tileImage['X'].onload = function () { tileReady['X'] = true; }; tileImage['X'].src = 'Images/Stef.jpg'; tileReady['Y'] = false; tileImage['Y'] = new Image(); tileImage['Y'].onload = function () { tileReady['Y'] = true; }; tileImage['Y'].src = 'Images/Kathy.jpg'; tileReady['Z'] = false; tileImage['Z'] = new Image(); tileImage['Z'].onload = function () { tileReady['Z'] = true; }; tileImage['Z'].src = 'Images/AnitaF.jpg'; tileReady['0'] = false; tileImage['0'] = new Image(); tileImage['0'].onload = function () { tileReady['0'] = true; }; tileImage['0'].src = 'Images/Chris.jpg'; tileReady['1'] = false; tileImage['1'] = new Image(); tileImage['1'].onload = function () { tileReady['1'] = true; }; tileImage['1'].src = 'Images/CarolP.jpg'; tileReady['2'] = false; tileImage['2'] = new Image(); tileImage['2'].onload = function () { tileReady['2'] = true; }; tileImage['2'].src = 'Images/Jim.jpg'; tileReady['3'] = false; tileImage['3'] = new Image(); tileImage['3'].onload = function () { tileReady['3'] = true; }; tileImage['3'].src = 'Images/Barbara.jpg'; tileReady['4'] = false; tileImage['4'] = new Image(); tileImage['4'].onload = function () { tileReady['4'] = true; }; tileImage['4'].src = 'Images/Jan.jpg'; tileReady['5'] = false; tileImage['5'] = new Image(); tileImage['5'].onload = function () { tileReady['5'] = true; }; tileImage['5'].src = 'Images/Dad.jpg'; tileReady['6'] = false; tileImage['6'] = new Image(); tileImage['6'].onload = function () { tileReady['6'] = true; }; tileImage['6'].src = 'Images/Bennett.jpg'; tileReady['7'] = false; tileImage['7'] = new Image(); tileImage['7'].onload = function () { tileReady['7'] = true; }; tileImage['7'].src = 'Images/Bethany.jpg'; tileReady['8'] = false; tileImage['8'] = new Image(); tileImage['8'].onload = function () { tileReady['8'] = true; }; tileImage['8'].src = 'Images/Lucas.jpg'; tileReady['9'] = false; tileImage['9'] = new Image(); tileImage['9'].onload = function () { tileReady['9'] = true; }; tileImage['9'].src = 'Images/Angel.jpg'; 			
+	</script>
+	<script src="shanghai.js"></script>
+</div>
+</td></tr></table>
+	<br>About the Game
+	<ul class=green10>
+		<li>There are 4 copies each of 36 different tiles.</li>
+		<li>Remove matching pairs of tiles by clicking on tiles that are free.</li>
+		<li>Tiles are free if they can slide to the right or the left.</li>
+		<li>Light blue tiles are only one deep.</li>
+		<li>Gold tiles are two deep.</li>
+		<li>Dark green tiles are three deep.</li>
+		<li>Red tiles are four deep.</li>
+		<li>Most puzzles can be played down to zero tiles.</li>
+		<li>Hints don't cost you anything, so you can use them to get started.</li>
+		<li>Rather than a high score list, ToMarGames uses a ranking system based on all scores for that game.</li>
+		<li>You move up through the ranks by earning stars.</li>
+		<li>If you solve the puzzle, you earn a star.</li>
+		<li>If you solve it in 72 moves, you earn 3 stars.</li>
+		<li>If you come in under 120 moves, you earn 2 stars.</li>
+	</ul>
+</body>
+</html>
+
