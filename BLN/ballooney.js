@@ -2,7 +2,7 @@
 var canvas = document.getElementById("dbCanvas");
 var ctx = canvas.getContext("2d");
 // constants
-var intNUMBEROFCOLORS = 5;
+var intNUMBEROFCOLORS = 5;          // easy cheat
 var intNUMBEROFROWS = 10;
 var intNUMBEROFCOLUMNS = 15;
 var intCOLUMNTWO = 680;
@@ -15,11 +15,11 @@ var selects = [];
 var columns = [];
 var historyStack = [];
 var intLevel = 0;
-var intPoints = 0;						// this is total points for all levels
-var intLevelPoints = 0;				// this is just the points for this level, so you can restore to beginning of level
+var intPoints = 0;						// this is total points scored during this level
+var intLevelPoints = 0;				// this is the points coming into this level, should be 0 during level 1
 var intBalloons;
 var	intHighestScore = 0;
-var intLowestCount;
+var intLowestCount = 150;
 var boolPopping = true;
 var btnBackUp = new tmButton(intCOLUMNTWO, 450, getColorLIGHTBLUE(), 120, 35, "Back Up", 16);
 var btnStartOver = new tmButton(intCOLUMNTWO, 520, getColorLIGHTYELLOW(), 120, 35, "Start Over", 16);
@@ -29,14 +29,22 @@ canvas.addEventListener("click", mouseClick);
 reInit();
 
 // objBalloon constructor
-function objBalloon(row, col) 
+function objBalloon(row, col, color) 
 {
 	this.row = row;
 	this.col = col;
-	this.color = getIntRnd(intNUMBEROFCOLORS - 1);			// will yield 0 through 4
+	if (color === undefined)
+	{
+		this.color = getIntRnd(intNUMBEROFCOLORS - 1);			// will yield 0 through 4
+	}
+	else
+	{
+		this.color = color;
+	}	
 	this.x = (this.col + 1) * 1.5 * intWIDTH;		
 	this.y = intTOPMARGIN + (this.row + 1) * 1.75 * intHEIGHT;
 	this.boolSelected = false;
+//	display("Constructed Row=" + this.row + ", col=" + this.col + ", color=" + this.color + ", color coming in was " + color);
 	this.setCol = function(newcol)
 	{
 		this.col = newcol;
@@ -62,7 +70,7 @@ function objBalloon(row, col)
 		ctx.beginPath();
 		ctx.fillStyle = getColorWHITE();
 		ctx.fillRect(this.x + 5, this.y - 15, 3, 4);
-		printText(this.row + ", " + this.col, this.x - 10, this.y, getColorWHITE(), 12);
+//	printText(this.row + ", " + this.col, this.x - 10, this.y, getColorWHITE(), 12);
 	}
 	this.isSelected = function()
 	{
@@ -72,15 +80,6 @@ function objBalloon(row, col)
 	{
 		return formatNumber(this.col, 2) + this.row + this.color;
 	}
-	this.decode = function(codeString)
-	{
-		console.log("Balloon decoding " + codeString);
-		this.setCol(codeString.substring(0, 2) * 1);
-		this.setRow(codeString.substring(2, 3) * 1);
-		this.color = codeString.substring(3) * 1;
-		this.boolSelected = false;
-		console.log("Decoded to " + this.display());
-	}			
 	this.display = function()
 	{
 		return "Row=" + this.row + ", col=" + this.col + ", color=" + this.color;
@@ -123,9 +122,8 @@ function objColumn(col)
 		}
 	}
 	this.encode = function()
-
 	{
-		var codeString = this.balloons.length - 1;
+		var codeString = this.balloons.length - 1;					// remember to add it back in during the decode
 		for (var r = 0; r < this.balloons.length; r++)
 		{	
 			codeString += this.balloons[r].encode();
@@ -134,40 +132,47 @@ function objColumn(col)
 	}
 	this.decode = function(codeString)
 	{
-		console.log("Column string is " + codeString);
-		var n = (codeString.substring(0,1) * 1);
+		var n = (codeString.substring(0,1) * 1) + 1;				// number of balloons that were in the column
 		codeString = codeString.substring(1);
-		for (var r = 0; r < n + 1; r++)
+//		display(n + " balloons will be added using this string: " + codeString);
+		this.balloons = [];
+		for (var r = 0; r < n; r++)
 		{
-			if (r >= this.balloons.length)
-			{
-				this.balloons[r] = new objBalloon(0, 0);
-			}	
-			this.balloons[r].decode(codeString.substring(0, 4));
+			this.balloons[this.balloons.length] = new objBalloon(codeString.substring(2, 3) * 1, codeString.substring(0, 2) * 1, codeString.substring(3, 4) * 1);
 			codeString = codeString.substring(4); 
 		}
 		return codeString;
 	}				
 }	
+function restoreColumns(s)
+{
+	var cntr = 0;
+	while (s.length > 0)
+	{
+		if (cntr >= columns.length)
+		{
+			columns[cntr] = new objColumn(cntr);
+		}	
+		s = columns[cntr++].decode(s);
+//		display("Codestring for column " + cntr + ": " + s);
+	}
+}
 function mouseClick(event)
 {
+	stringMessage = "";
 	if (btnStartOver.clicked(currentX, currentY))
 	{
 		if (window.confirm("Restart puzzle from the beginning of this level?") == true) 
 		{
 			if (historyStack.length > 0)
 			{
+				// this restores the very first thing that was put on the history stack
 				var historyString = historyStack[0].substring(3);
-				console.log("History string: " + historyString);
-				var cntr = 0;
-				intPoints -= intLevelPoints;
+				intPoints = 0;
 				intBalloons = intNUMBEROFROWS * intNUMBEROFCOLUMNS;
-				intLevelPoints = 0;
-				while (historyString.length > 0)
-				{
-					console.log("Column " + cntr + " History string: " + historyString);
-					historyString = columns[cntr++].decode(historyString);
-				}
+				restoreColumns(historyString);
+				historyStack = [];
+				stringMessage = "Restored to the beginning of Level " + intLevel + ".";
 			}	
     } 	
   }   
@@ -184,6 +189,7 @@ function mouseClick(event)
 			else
 			{		
 				initPuzzle();
+				stringMessage = "Here is a new puzzle.";
 			}	
     } 	
   }   
@@ -204,39 +210,29 @@ function mouseClick(event)
 			}	
 			historyStack[historyStack.length] = historyString;					// end of saving history
 			var p = (selects.length * selects.length * intLevel);
-			intLevelPoints += p;
 			intPoints += p;
-			stringMessage = "" + p + " points!";
-			intHighestScore = getHighestScore(intPoints + getBonus());
+			stringMessage = "Popped " + selects.length + " balloons for " + p + " points.";
 			var popCols = [];
-			console.log("Selects length is " + selects.length);
 			for (var i = 0; i < selects.length; i++)
 			{	
 				intBalloons -= 1;
 				popCols[popCols.length] = selects[i].col;											// column id is on stack to be renumbered
-				console.log("Popping balloon: " + columns[selects[i].col].balloons[selects[i].row].display()); 			// balloon is now gone
+//			display("Popping balloon: " + columns[selects[i].col].balloons[selects[i].row].display()); 			// balloon is now gone
 				delete columns[selects[i].col].balloons[selects[i].row]; 			// balloon is now gone
 			}
-			console.log("Popped columns before filter: " + popCols.length);
 			var renumberColumns = popCols.filter(onlyUnique);								// subscripts of columns from which balloons were removed
-			console.log("Popped columns after filter: " + renumberColumns.length);
 			popCols = [];
 			for (var i = 0; i < renumberColumns.length; i++)
 			{
-				console.log("Check stacked column i = " + i + ", subscript is " + renumberColumns[i] + ", balloons = " + columns[renumberColumns[i]].balloons.length);
 				if (columns[renumberColumns[i]].renumber() === false)
 				{
-					console.log("No balloons left -- deleting.");
 					popCols[popCols.length] = renumberColumns[i];					// subscript of column being deleted added to stack 
 					delete columns[renumberColumns[i]];										// column is now gone
 				}
 			}
-			console.log("After column renumbering, " + popCols.length + " columns deleted.");
 			if (popCols.length > 0)    // renumber the columns because some have been deleted
 			{	
-				console.log("Board before filter = " + columns.length);
 				var newBoard = columns.filter(removeDeleted);
-				console.log("Board after filter = " + newBoard.length);
 				for (var c = 0; c < newBoard.length; c++)
 				{	
 					newBoard[c].setColumn(c);								// set the new column and refigure x coordinate
@@ -247,7 +243,9 @@ function mouseClick(event)
 		selects = [];
 		if (intBalloons == 0)
 		{	
-			intPoints += 2500 * level;
+			intPoints += 2500 * intLevel;
+//	  display("Beat level " + intLevel + ", points is " + intPoints);
+			intLevelPoints += intPoints;
 			reInit();
 		}
 		boolPopping = false;	
@@ -361,9 +359,9 @@ function getBonus()
 		}
 		if (base < 25)
 		{
-			return base * 50 * level;
+			return base * 50 * intLevel;
 		}
-		return 1500 * level;
+		return 1500 * intLevel;
 	}
 function getHighestScore(newScore)
 	{
@@ -381,23 +379,21 @@ function addToSelects(balloon)
 }	
 function backUp()
 {
-	console.log("Coming into backup, stack is " + historyStack.length);
 	if (historyStack.length > 0)
 	{
 		var historyString = historyStack.pop();
-		console.log("History string: " + historyString);
-		var cntr = 0;
-		var p = historyString.substring(0, 3) * 1;
-		intPoints -= (p * p * intLevel);
-		intBalloons += p;
-		historyString = historyString.substring(3);
-		while (historyString.length > 0)
-		{
-			console.log("Column " + cntr + " History string: " + historyString);
-			historyString = columns[cntr++].decode(historyString);
-		}
+//	display("History string: " + historyString);
+		var p = historyString.substring(0, 3) * 1;				// number of balloons taken in the move being restored
+		intPoints -= (p * p * intLevel);									// subtracts the points that had been awarded
+		intBalloons += p;																	// adds the balloons back into the count
+		stringMessage = "Restored " + p + " balloons.";
+		restoreColumns(historyString.substring(3));
 	}	
 }	
+function display(s)
+{
+	console.log(Date.now() + ": " + s);
+}
 function getLowestCount(newScore)
 {
 	if (newScore < intLowestCount)
@@ -429,14 +425,14 @@ function render()
 			}
 		}
 		var y = 40;
-		printText(stringMessage, 28, 10, getColorDARKGREEN(), 32);	
+		printText(stringMessage, 28, 10, getColorDARKGREEN(), 32);
 		printText("Level: " + intLevel, intCOLUMNTWO, 18 + 1 * y, getColorDARKBLUE(), 32);
-		printText("Points: " + intPoints, intCOLUMNTWO, 18 + 2 * y, getColorDARKGREEN(), 32);
+		printText("Points: " + (intPoints + intLevelPoints), intCOLUMNTWO, 18 + 2 * y, getColorDARKGREEN(), 32);
 		printText("Selected: " + selects.length, intCOLUMNTWO, 18 + 3 * y, getColorDARKBLUE(), 32);
 		printText("Moves: " + historyStack.length, intCOLUMNTWO, 18 + 4 * y, getColorDARKGREEN(), 32);
 		printText("Bonus: "  + getBonus(), intCOLUMNTWO, 18 + 5 * y, getColorDARKBLUE(), 32);
-		printText("Total: " + (intPoints + getBonus()) , intCOLUMNTWO, 18 + 6 * y, getColorDARKGREEN(), 32);
-		printText("High: " + intHighestScore, intCOLUMNTWO, 18 + 7 * y, getColorDARKBLUE(), 32);
+		printText("Total: " + (intPoints + intLevelPoints + getBonus()) , intCOLUMNTWO, 18 + 6 * y, getColorDARKGREEN(), 32);
+		printText("High: " + getHighestScore(intPoints + intLevelPoints + getBonus()), intCOLUMNTWO, 18 + 7 * y, getColorDARKBLUE(), 32);
 		printText("Balloons: " + intBalloons, intCOLUMNTWO, 18 + 8 * y, getColorDARKGREEN(), 32);
 		printText("Lowest: " + getLowestCount(intBalloons), intCOLUMNTWO, 18 + 9 * y, getColorDARKBLUE(), 32);
   	btnBackUp.draw();
@@ -451,6 +447,7 @@ function reInit()
 	{
 		columns[c] = new objColumn(c);
 	}
+	intPoints = 0;
 	selects = [];
 	intBalloons = intLowestCount = intNUMBEROFCOLUMNS * intNUMBEROFROWS;
 	historyStack = [];

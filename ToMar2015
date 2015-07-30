@@ -1,0 +1,53 @@
+<NotepadPlus>
+    <Project name="ToMar2015">
+        <Folder name="AAA">
+            <File name="AAA\aa.js" />
+            <File name="AAA\index.php" />
+            <File name="AAA\aa.php" />
+            <File name="AAA\aa.xml" />
+            <File name="AAA\aaPlayer.php" />
+        </Folder>
+        <Folder name="BLN">
+            <File name="BLN\ballooney.js" />
+            <File name="BLN\index.php" />
+            <File name="BLN\Game.xml" />
+            <File name="BLN\Player.xml" />
+        </Folder>
+        <Folder name="DBL">
+            <File name="DBL\db.js" />
+            <File name="DBL\index.php" />
+            <File name="DBL\Game.xml" />
+            <File name="DBL\Player.xml" />
+        </Folder>
+        <Folder name="SHG">
+            <File name="SHG\shanghai.js" />
+            <File name="SHG\index.php" />
+            <File name="SHG\Game.xml" />
+            <File name="SHG\Player.xml" />
+        </Folder>
+        <Folder name="Tea">
+            <File name="Tea\tea.css" />
+            <File name="Tea\balances.php" />
+            <File name="Tea\index.php" />
+            <File name="Tea\processTea.php" />
+            <File name="Tea\teaDO.php" />
+            <File name="Tea\teaEntry.php" />
+            <File name="Tea\teaDates.xml" />
+            <File name="Tea\teaPeople.xml" />
+        </Folder>
+        <Folder name="js">
+            <File name="js\utils.js" />
+            <File name="styles.css" />
+            <File name="js\tmWords.txt" />
+        </Folder>
+        <Folder name="php">
+            <File name="php\Game.php" />
+            <File name="php\GameData.php" />
+            <File name="php\index.php" />
+            <File name="php\Player.php" />
+            <File name="php\tmUtils.php" />
+            <File name="php\Game.xml" />
+            <File name="php\Player.xml" />
+        </Folder>
+    </Project>
+</NotepadPlus>

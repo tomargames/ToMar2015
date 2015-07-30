@@ -8,10 +8,6 @@ global $id;
 global $nm;
 $id = $_POST["id"];
 $nm = $_POST["nm"];
-if ($id == "")
-{
-	echo '<script> alert("Sign in to play games. Thanks!"); window.location = "../Menu"; </script>';
-}
 // Step2: read player file and identify player
 $players = PlayerFromXML();
 $player = thisPlayer($id, $nm, $players);
@@ -65,16 +61,10 @@ if (is_finite($sc) && $sc > 0)
 ?>
 </table>
 <br><br>
-<form name="menuForm" action="../" method="post">			
+<form action="../" method="post">			
 <input type="hidden" name="id" value="<?php echo $id; ?>">
 <input type="hidden" name="nm" value="<?php echo $nm; ?>">
 <input type="submit" value="ToMarGames Menu"><br><br>	
-</form>
-<form name="gameForm" action="../DBL/" method="post">			
-<input type="hidden" name="id" value="<?php echo $id; ?>">
-<input type="hidden" name="nm" value="<?php echo $nm; ?>">
-<input type="hidden" name="score">
-<input type="hidden" name="tsp">
 </form>
 <table border=1>
 	<tr><td colspan="3" class="magentah">Players</td></tr>
@@ -90,18 +80,21 @@ if (is_finite($sc) && $sc > 0)
 <td width="1">&nbsp; </td>		
 <td>
 <div id="app"> 
-	<canvas id="dbCanvas" width="800" height="600" style="border:5px solid #ff0000;" style="cursor:crosshair;">
+	<canvas id="dbCanvas" width="800" height="600" style="border:5px solid #ff0000;">
 		Your browser does not support the canvas element.
 	</canvas>
 	<script>
 <?php
+	echo "var stringPlayerId = '".$id."'; ";
+	echo "var stringPlayerName = '".$nm."'; ";
+	echo "var stringSite = '".$site."'; ";
 	if ("NONE" !== $message)
 	{
 		echo "var stringMessage = '".$message."'; ";
 	}
 	else	
 	{
-		echo "var stringMessage = 'Welcome to DodgeBall!'; ";
+		echo "var stringMessage = 'Welcome to DodgeBall, ".$nm."!'; ";
 	}
 ?>		
 	</script>

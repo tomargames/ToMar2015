@@ -55,7 +55,7 @@ $games = GameFromXML();
 			<table cellpadding="1" cellspacing="1">
 <?php
 		$codes = array("J", "W", "L", "F", "S");
-		$descs = array("Just Games", "Word Games", "Logic/Math Games", "Fast Games", "Slow Games");
+		$descs = array("All Games", "Word Games", "Logic/Math Games", "Fast Games", "Slow Games");
 		for ($i = 0; $i < 5; $i++)
 		{
 			if ($codes[$i] == $ctg)
@@ -82,7 +82,7 @@ $games = GameFromXML();
 <?php
 	foreach ($games as $g)
 	{
-			if (strpos($g->getType(), $ctg) > -1)
+			if (strcmp($ctg, "J") == 0 || strpos($g->getType(), $ctg) > -1)
 			{
 				$lk = "javascript:playGame('".$g->getID()."');";
 				$dd = "<a href=javascript:playGame('".$g->getID()."');>".$g->getDesc()."</a>";

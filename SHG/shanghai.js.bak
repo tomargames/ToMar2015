@@ -460,8 +460,16 @@ function resetSel()
   	}	
   }	
 }
+function doCancel()
+{
+	console.log("In doCancel()");
+	resetSel();
+	stringMessage = "";
+	dialog.removeEventListener('cancel', doCancel());
+}	
 function doTaken()
 {
+	console.log("Taken dialog returned " + dialog.returnValue);
 	resetSel();
 	var takenAt = NUMTILES;
   for (var i = intMoves - 1; i > -1 ; i--)
@@ -491,6 +499,7 @@ function doTaken()
 }		
 function doFind()
 {
+	console.log("Find dialog returned " + dialog.returnValue);
   if (stringLETTERSET.indexOf(dialog.returnValue) > -1)
   {
 		resetSel();

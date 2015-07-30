@@ -49,7 +49,14 @@ if (is_finite($sc) && $sc > 0)
 	$players[trim($id)] = $player;
 	writePlayerXML($players);
 }
-$dirArray = scandir("images");
+// look for a folder named i + $id and use it if it's there, otherwise use "images"
+// 106932376942135580175 marie
+// 101026609230093049061 danielle
+$dirArray = scandir("i".$id);
+if (count($dirArray) < 3)
+{	
+	$dirArray = scandir("images");
+}	
 array_splice($dirArray, 0, 2);
 $puzzlePicks = 	randomSubset($dirArray, 36);
 ?>

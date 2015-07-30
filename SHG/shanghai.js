@@ -32,8 +32,6 @@ var btnClearSels = new tmButton(950, 600, getColorORANGE(), 120, 35, "Clear", 16
 var savedGame = getCookie(stringCookieName);
 var tileData = [];
 loadTileData();
-canvas.width = 1100;
-canvas.height = 650;
 canvas.addEventListener("click", mouseClick);
 // cookie will be 145 character string to load tiles with
 //                4-digit intTotalMoves
@@ -156,6 +154,7 @@ function objTile(num)
 				ctx.textAlign = "left";
 				ctx.textBaseline = "top";
 				ctx.fillStyle = textColor;
+				// if you're ever in this code again, test this with the xFactor method in AAA
 				var c = (this.character === "W") ? this.getX() + 16 : (this.character === "I") ? this.getX() + 26 : this.getX() + 20;
 				ctx.fillText(this.character, c, r + 12);
 			}	

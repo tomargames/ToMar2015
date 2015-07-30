@@ -204,7 +204,7 @@ function main()
 		if (intPoints > intThreshold)
 		{
 			intMaxBad += 1;
-			intThreshold = (intThreshold < 10000) ? intThreshold * 2 : intThreshold + 5000;
+			intThreshold = (intThreshold < 50000) ? intThreshold * 2 : intThreshold + 5000;
 		}
 	}
 	render();

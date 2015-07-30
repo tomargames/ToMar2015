@@ -113,9 +113,14 @@ function PlayerFromXML()
  		} 
  		$returnArray[$x->getID()] = $x; 
  	} 
- $newArray = null; 
- usort($returnArray, 'sortArray'); 
- foreach($returnArray as $r)  {  	$newArray[$r->getID()] = $r;  } return $newArray; } 
+	$newArray = null; 
+	usort($returnArray, 'sortArray'); 
+	foreach($returnArray as $r)  
+	{  	
+		$newArray[$r->getID()] = $r;  
+	} 
+	return $newArray; 
+} 
 function writePlayerXML($arr)	
 {
 	$xmlString = "<?xml version='1.0' encoding='ISO-8859-1'?><root>";

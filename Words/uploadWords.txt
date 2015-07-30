@@ -1,0 +1,12 @@
+open www.tomargames.com
+user ftp1848958
+wodVwyf5
+ascii
+put words3.txt ToMar2012/Words/words3.txt
+put words4.txt ToMar2012/Words/words4.txt
+put words5.txt ToMar2012/Words/words5.txt
+put wordsuwm.txt ToMar2012/Words/wordsuwm.txt
+put words6.txt ToMar2012/Words/words6.txt
+put wordsRest.txt ToMar2012/Words/wordsRest.txt
+put words5ws.txt ToMar2012/Words/words5ws.txt
+bye

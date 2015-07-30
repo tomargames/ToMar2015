@@ -13,7 +13,7 @@
 	<tr>
 		<td class="fineprint10" width="20%"><a class=fineprint8 href="../Menu">MENU</a></td>
 		<td class="banner" width="60%">ToMarGames</td>
-		<td class="fineprint10" width="20%"></td>
+		<td class="fineprint10" width="20%"><a class="coinbase-button" data-code="00732638e22fdc666879c182753a7910" data-button-style="donation_small" href="https://coinbase.com/checkouts/00732638e22fdc666879c182753a7910">Donate Bitcoins</a><script src="https://coinbase.com/assets/button.js" type="text/javascript"></script></td>
 	</tr>
 	<tr><td colspan=3>
 		<p class=green32C>About ToMarGames</p>

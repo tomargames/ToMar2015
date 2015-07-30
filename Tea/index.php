@@ -67,21 +67,20 @@ for (var i = 0; i < teaCount; i++)
 	}		
 ?>
 		</table></td>
+		<td width="50"> </td>
 		<td><table border=1>
 		<tr><td>ID</td>
 			<td>Name</td>
-			<td>Sex</td>
 			<td>Bridge</td>
 			<td>Teas</td>
 		</tr>		
 <?php
 	foreach ($TeaPerson	 as $tp)
 	{
-		if ($tp->getTotal() > 1)
+		if ($tp->getPic() != "")
 		{
-			echo "<tr><td class=black10>".$tp->getId();
+			echo "<tr><td><img src='../SHG/images/".$tp->getPic().".png'>";
 			echo "</td><td class=black10>".$tp->getFirst()." ".$tp->getLast();
-			echo "</td><td class=black10>".$tp->getSex();
 			echo "</td><td class=black10><script>document.write(people['".$tp->getSource()."']); </script>";
 			echo "</td><td class=black10num id='".$tp->getTypeId()."5'><a class=magenta10 href=javascript:showTeas('".$tp->getTypeId()."5".$tp->getTeas()."');>".$tp->getTotal()."</a></td></tr>";
 		}	

@@ -35,9 +35,13 @@ function processPeople($table,$numTeas,$sort)
 			{
 				$person->setSex($attr);
 			}	
-  			elseif ($attr->getName() == "type")
+  		elseif ($attr->getName() == "type")
 			{
 				$person->setSource($attr);
+			}	
+	 		elseif ($attr->getName() == "pic")
+			{
+				$person->setPic($attr);
 			}	
 			elseif ($attr->getName() == "teas")
 			{
@@ -150,11 +154,20 @@ class TeaPerson extends TeaObject
 	private $sex = "";	
 	private $teas = "";  	// this will be an array of TeaDate keys
 	private $total = 0;
+	private $pic = "";
 	
+	public function getPic()
+	{
+		return $this->pic;
+	}
 	public function getTotal()
 	{
 		return $this->total;
 	}
+	public function setPic($t)	
+	{
+		$this->pic = $t;
+	}	
 	public function setTotal($t)	
 	{
 		$this->total = $t;

@@ -1,59 +1,45 @@
 <?php
-require 'Player.php';
-require 'Game.php';
 require 'tmUtils.php';
-// Step1: verify login
-	$id = $_GET["id"];
-	$site = "http://www.tomargames.com/ToMar2012/";
-	if ($id == null)
+$file=fopen("../js/tmWords.txt","r") or exit("Unable to open file!");
+while(!feof($file))
+{
+	$w = trim(fgets($file));
+	if (strlen($w) == 4)
 	{
-		echo "<script> window.location = '".$site."Scoring/login.php?login'; </script>";
+		$fours[count($fours)] = $w;
 	}
-// Step2: read player file and identify player
-	$nm = $_GET["nm"];
-	$players = PlayerFromXML();
-	$player = thisPlayer($id, $nm, $players);
-// Step3: read game file and build stats coming in
-	global $mean;
-	global $highest;
-	global $std;
-	$games = GameFromXML();
-	$stats = "Highest: ".$highest."<br>Average: ".$mean."<br>StdDev: ".$std."<br>";
-// Step4: if there's a score coming in, process it
-	$sc = $_GET["score"];
-	echo "Score: ".$sc."<br>";
-	if (!(is_finite($sc)))
+	else if (strlen($w) == 5)
 	{
-?>
-		<html>
-			<form action="http://www.tomargames.com/ToMar2012/Scoring/">
-				Score:
-				<input type="text" name="score">
-				<input type="hidden" name="nm" value=<?php echo $nm; ?> >
-				<input type="hidden" name="id" value=<?php echo $id; ?> >
-				<input type="submit" value="Submit">
-			</form>	
-	</html>
-<?php 		
-	}	
-	else	
-	{
-		echo $sc." is a number.<br>";
-		$award = CalculateAward($sc, $games);
-		global $blurb;
-		$stats = "Your Score: ".$sc."<br>Award: ".$award."<br>".$stats;
-		debug("Before");
-	  debug("Games: ".$player->getGames());
-	  debug("Level: ".$player->getLevel());
-	  debug("Stars: ".$player->getStars());
-		$message = $sc." points. ".$blurb[$award + 1].$player->processAward($award);
-		$players[trim($id)] = $player;
-		debug("After");
-		debug($message);
-	  debug("Games: ".$player->getGames());
-	  debug("Level: ".$player->getLevel());
-	  debug("Stars: ".$player->getStars());
-		writePlayerXML($players);
+		$fives[count($fives)] = $w;
 	}
-	debug($stats);		 
+	else if (strlen($w) == 3)
+	{
+		$threes[count($threes)] = $w;
+	}
+}
+fclose($file);   
+foreach($fours as $w4)
+{
+	if (noRepeatedLetters($w4))
+	{		
+		$char4 = str_split($w4);
+		foreach($fives as $w5)
+		{
+			if (noRepeatedLetters($w5))
+			{	
+				$char5 = str_split($w5);
+				if ($char4[1] == $char5[1])
+				{		
+					if ($char4[2] == $char5[4])
+					{	
+						if ($char4[3] == $char5[3])
+						{
+							echo $w4." ".$w5."<br>";
+						}	
+					}
+				}	
+			}	
+		}	
+	}
+}	
 ?>	

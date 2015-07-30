@@ -1,0 +1,1 @@
+ftp -n -v -s:uploadWords.txt

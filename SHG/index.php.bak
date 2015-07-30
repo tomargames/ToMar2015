@@ -10,7 +10,7 @@ $id = $_POST["id"];
 $nm = $_POST["nm"];
 if ($id == "")
 {
-	echo '<script> alert("Sign in to play games. Thanks!"); window.location = "../Menu"; </script>';
+//	echo '<script> alert("Sign in to play games. Thanks!"); window.location = "../Menu"; </script>';
 }
 // Step2: read player file and identify player
 $players = PlayerFromXML();
@@ -29,19 +29,7 @@ if (is_finite($sc) && $sc > 0)
 	$tsp = $_POST["tsp"];
 	$award = CalculateAward($sc, $tsp.$id, $games);
 //Shanghai awards are different, but the above processing needs to be done first, so now:
-	if ($sc == 72)
-	{
-		$award = 3;
-	}
-	else if ($sc < 120)
-	{
-		$award = 2;
-	}
-	else
-	{
-		$award = 1;
-	}			
-//	$award = ($sc == 72)? 3 : ($sc < 120) ? 2 : 1;
+	$award = ($sc == 72)? 3 : ($sc < 120) ? 2 : 1;
 //end of Shanghai special processing	
 	global $blurb;
 	$stats = "Your Score: ".$sc."<br>Award: ".$award."<br>".$stats;
@@ -130,12 +118,29 @@ $puzzlePicks = 	randomSubset($dirArray, 36);
 	foreach ($puzzlePicks as $p)
 	{
 		$names[$iCnt] = substr($p, 0, strpos($p, $dot));
-		echo "tileReady['".substr($chars, $iCnt, 1)."'] = false; tileName['".substr($chars, $iCnt, 1)."'] = '".substr($p, 0, strpos($p, $dot))."'; tileImage['".substr($chars, $iCnt, 1)."'] = new Image(); tileImage['".substr($chars, $iCnt, 1)."'].onload = function () { tileReady['".substr($chars, $iCnt, 1)."'] = true; }; tileImage['".substr($chars, $iCnt++, 1)."'].src = 'images/".$p."'; ";
+		echo "tileReady['".substr($chars, $iCnt, 1)."'] = false; tileName['".substr($chars, $iCnt, 1)."'] = '".substr($p, 0, strpos($p, $dot))."'; tileImage['".substr($chars, $iCnt, 1)."'] = new Image(); tileImage['".substr($chars, $iCnt, 1)."'].onload = function () { tileReady['".substr($chars, $iCnt, 1)."'] = true; }; tileImage['".substr($chars, $iCnt++, 1)."'].src = 'Images/".$p."'; ";
 	}
 ?>			
 	</script>
-	<dialog id="dialog" style="background-color: #ccccff;">
-  <form method="dialog">
+	<dialog id="findDialog" style="background-color: #ccccff;">
+  <form method="findDialog">
+    <p>Click who to search for, or use Escape key to cancel</p>
+    <table>
+<?php 
+	for ($row = 0; $row < 6; $row++)
+	{
+		echo "<tr>";
+		for ($i = $row; $i < 36; $i += 6)
+		{
+			echo '<td><button type="submit" value="'.substr($chars, $i, 1).'">'.substr($chars, $i, 1).' '.$names[$i].'</button></td>';
+		}
+		echo "</tr>";
+	}		
+?>		
+	</table>
+  </form></dialog>
+	<dialog id="takenDialog" style="background-color: #ccffcc;">
+  <form method="takenDialog">
     <p>Click who to search for, or use Escape key to cancel</p>
     <table>
 <?php 
