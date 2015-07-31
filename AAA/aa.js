@@ -9,7 +9,6 @@
 // Create the canvas and game variables
 var canvas = document.getElementById("dbCanvas");
 var ctx = canvas.getContext("2d");
-var dialog = document.getElementById("dialog");
 var MAXLEVEL = 78;
 var SIZE = 19;
 var COLUMNMARGIN = 2;
@@ -32,7 +31,6 @@ var POOLSELECTED = 3;		// yellow, show letter
 var POOLUSED = 4;			// dark gray, show letter
 var levelWords = [];
 var levelPool = [];
-var levelList = [];
 var intLevel = 0;
 var playLevel = 0;
 var lblGiveUp = "GIVE UP";
@@ -49,6 +47,7 @@ var clrBACKGROUND = getColorCREAM();
 var selectedSlot = null;
 var objSlotClassName = "SLOT";
 var objAnchorClassName = "ANCHOR";
+var wordList = "";
 
 canvas.addEventListener("click", mouseClick);
 init();
@@ -153,18 +152,18 @@ function wordPatternFit(word, pattern)
 }
 function makeWordList()
 {
-	levelList = [];
+	wordList = "";
 	for (var i = 0; i < intLevel; i++)
 	{
-		levelList[levelList.length] = levelWords[i].pattern;
+		wordList += (levelWords[i].pattern + "\n");
 		for (var j = 0; j < words.length; j++)
 		{	
 			if (wordPatternFit(words[j], levelWords[i].pattern))
 			{
-				levelList[levelList.length] = words[j];
+				wordList += (words[j] + "\n");
 			}	
 		}	
-		levelList[levelList.length] = "------------";
+		wordList += "------------\n";
 	}
 	// This sorts the letterPool into alphabetical order
 	levelPool = levelPool.sort(function(a, b)	{ return (a.letter < b.letter) ? -1 : (a.letter > b.letter) ? 1 : 0; });
@@ -414,12 +413,12 @@ function mouseClick(event)
 		}	
 		else if (btnWords.clicked(currentX, currentY))
 		{
-			dialog.showModal();
+			alert(wordList);
 			return;
 		}
 		else if (btnHint.clicked(currentX, currentY))
 		{
-			if (window.confirm("Put letters back if they don't match the word we had in mind?") == true) 
+//		if (window.confirm("Put letters back if they don't match the word we had in mind?") == true) 
 			{
 				for (var targetWord = 0; targetWord < intLevel; targetWord++)
 				{	// look at each element to see if it's a slot

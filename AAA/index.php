@@ -90,9 +90,6 @@ $player = getPlayer($id, $players);
 	fclose($file);   
 ?>			
 	</script>
-	<dialog id="dialog">
-	This is the word list.
-	</dialog>
 	<script src="aa.js"></script>
 </div>
 </td></tr></table>
