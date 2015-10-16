@@ -7,8 +7,8 @@ var canvas = document.getElementById("bCanvas");
 var ctx = canvas.getContext("2d");
 var UNTESTED = NOSHIP = 0;
 var TESTED = SELECTED = 1;
-var HIT = 2;
-var MISS = 3;
+var MISS = 2;
+var HIT = 3;
 var CONNECTING = "C";
 var PLACING = "P";
 var ACTIVE = "A";
@@ -22,19 +22,20 @@ var TOPMARGIN = 100;
 var MARGIN = 1;
 var SLENGTHS = [5, 4, 3, 3, 2];
 var SQCOLORS = [getColorCHARTREUSE(), getColorCHARTREUSE(), getColorDARKBLUE(), getColorDARKBLUE()];
-var SQSYMBOLS = ["", "X", "+", ""];
+var SQSYMBOLS = ["", "X", "",  "+"];
 var playerBoards = [];
 var playerNames = [];
 var playerIDs = [];
 var playerShips = [];
 var playerShots = [];
 var shipButtons = [];
+var shotsFired = 0;
 var flipButton = null;
 var fireButton = null;
 var user = 2;
 var opponent = 1;
 var nextActor = 0;
-var message = "Select a game.";
+var message = "Select a game, or start a new one.";
 var actionButton = null;
 var actionLabel = "";
 var shipButtons = null;
@@ -83,24 +84,18 @@ function objShot(row, col)
 		return false;		
 	}
 }
-function objShip(pNum, sId, str)
+function objShip(pNum, sId)
 {
-//console.log("objShip constructor, player is " + pNum + ", string is " + str);
 	this.player = pNum;
 	this.id = sId;
-	this.startCoor = new objShot(str.substr(0,1) * 1, str.substr(1,1) * 1);
-	this.horizontal = str.substr(2,1) * 1;
+	this.startCoor = new objShot(1, this.id + 1);
+	this.horizontal = 0;
 	this.selected = false;
 	this.safe = false;
-	this.sunk = true;
 	this.takeAction = function(act)
 	{
 		var r = this.startCoor.row;
 		var c = this.startCoor.col;
-		if (act == 2)
-		{
-			this.sunk = true;							// set to sunk, if anything is found alive, will change
-		}
 		for (var i = 0; i < SLENGTHS[this.id]; i++)
 		{
 			if (act == 0)				// select
@@ -110,13 +105,6 @@ function objShip(pNum, sId, str)
 			else if (act == 1)			// deselect
 			{
 				playerBoards[this.player][r][c].status = UNTESTED;
-			}
-			else if (act == 2)			// check to see if it's still alive
-			{
-				if (playerBoards[this.player][r][c].status == UNTESTED)
-				{
-					this.sunk = false;
-				}	
 			}
 			else if (act == 3)			// erase contents
 			{
@@ -154,11 +142,6 @@ function objShip(pNum, sId, str)
 			this.takeAction(1);					// 1 sets each square to UNTESTED
 		}		
 	}
-	this.isSunk = function()
-	{
-		this.sunk = this.takeAction(2);		// 2 is true if ship has been sunk
-		return this.sunk;
-	}
 	this.flip = function()
 	{
 		var newDir = (this.horizontal == 1) ? 0 : 1;
@@ -167,7 +150,7 @@ function objShip(pNum, sId, str)
 	}
 	this.place = function(row, col, hor)
 	{
-		console.log("player" + this.player + " place " + row + ", " + col + ", " + hor);
+//	console.log("player" + this.player + " place " + row + ", " + col + ", " + hor);
    	// first erase where it already is
 		this.takeAction(3);					// 3 erases whatever of the ship is there
 		this.startCoor.row = r = row;
@@ -214,7 +197,43 @@ function objSquare(playerNumber, row, col)
 		}
 		return false;
 	}
-  this.draw = function()
+	this.decode = function(ch, type)
+	{
+		var dec = 0;
+		if (type == this.player || type == 3)
+		{
+			if (ch == "a")
+			{
+				dec = 10;
+			}	
+			else if (ch == "b")
+			{
+				dec = 11;
+			}
+			else
+			{
+				dec = ch * 1;
+			}		
+			this.contents = Math.floor(dec/2);
+			if (dec % 2 == 1)				// square has been tested
+			{
+				if (this.contents == 0)
+				{
+					this.status = 2;
+				}	
+				else
+				{
+					this.status = 3;
+				}	
+			}
+		}
+		else	
+		{
+			this.status = ch * 1;
+		}
+//	console.log("Player" + this.player + ", ch is " + ch + ", status is " + this.status);
+	}
+  this.draw = function(type)
   {
     ctx.fillStyle = SQCOLORS[this.status];
     ctx.fillRect(this.x, this.y, SQSIZE, SQSIZE);
@@ -224,7 +243,7 @@ function objSquare(playerNumber, row, col)
 		ctx.rect(this.x, this.y, SQSIZE, SQSIZE);
 		ctx.stroke();
 		var tc = (this.status == SELECTED) ? selectedColor : getColorWHITE();
-		var c = (this.player == user) ? this.showBoat() : SQSYMBOLS[this.status];
+		var c = (this.player == type || type == 3) ? this.showBoat() : SQSYMBOLS[this.status];
 		printText(c, this.x + 11, this.y + 6, tc, 20);	
   }
 	this.showBoat = function()
@@ -232,13 +251,30 @@ function objSquare(playerNumber, row, col)
 		return (this.contents > 0) ? this.contents : "";
 	}
 }
+function refreshGrids()
+{
+	for (var i = 0; i < 2; i++)
+	{
+		for (var j = 0; j < GRIDSIZE; j++)
+		{
+			for (var k = 0; k < GRIDSIZE; k++)
+			{
+				playerBoards[i][j][k].status = UNTESTED;
+				playerBoards[i][j][k].contents = NOSHIP;
+			}	
+		}
+	}
+}
 function populateDisplay(passkey)
 {
-	selectedGame = passkey;
 	selectedShip = -1;
+	selectedGame = passkey;
 	playerNames[0] = names[selectedGame][0];
 	playerNames[1] = names[selectedGame][1];
 	user = rels[selectedGame];
+	opponent = (user == 1) ? 0 : 1;
+	refreshGrids();
+	fireButton = null;
 	var dataString = strings[selectedGame];
 	gameStage = firstChar(dataString);
 	if (gameStage == "C")   // you will only get this if the user is player0 or user is spectator
@@ -247,77 +283,101 @@ function populateDisplay(passkey)
 		return;
 	}
 	nextActor = dataString.substring(1, 2) * 1;
-	statusChars = dataString.substring(0, 2);
 	dataString = dataString.substring(2);
-	for (var i = 0; i < 2; i++)
+	if (gameStage == "A" || gameStage == "O")
 	{
-		charCounter = 0 + (i * 115);
-		playerShips[i] = [];
-		var shipStrings = [];
-		for (var s = 0; s < 5; s++)
+		for (var player = 0; player < 2; player++)
 		{
-			shipStrings[s] = dataString.substr(charCounter, 3);
-			charCounter += 3;
-		}
-		for (var j = 0; j < GRIDSIZE; j++)
-		{
-			for (var k = 0; k < GRIDSIZE; k++)
+			playerShots[player] = dataString.substr(0, 1);
+			dataString = dataString.substr(1);
+			for (var j = 0; j < GRIDSIZE; j++)
 			{
-				playerBoards[i][j][k].status = dataString.substring(charCounter++, charCounter);
-				playerBoards[i][j][k].contents = NOSHIP;
-			}	
+				for (var k = 0; k < GRIDSIZE; k++)
+				{
+					if (gameStage == "O")
+					{	
+						playerBoards[player][j][k].decode(dataString.substr(0, 1), 3);
+					}
+					else
+					{	
+						playerBoards[player][j][k].decode(dataString.substr(0, 1), user);
+					}
+					dataString = dataString.substr(1);
+				}	
+			}
 		}
-		for (var s = 0; s < 5; s++)
+		if (gameStage == "O")
 		{
-			playerShips[i][s] = new objShip(i, s, shipStrings[s]);
-			playerShips[i][s].takeAction(1);					// deselect it
+			message = playerNames[nextActor] + " has won the game!";
 		}	
-		playerShots[i] = 0;
-		for (var s = 0; s < 5; s++)
+		else if (user == nextActor)
 		{
-			if (playerShips[i][s].isSunk() == false)
-			{
-				playerShots[i] += 1;
-			}	
+			message = "It's your turn! Click on " + playerNames[opponent] + "'s grid to shoot.";
 		}
-	}
+		else
+		{		
+			message = "Waiting for " + playerNames[nextActor] + " to play.";
+		}	
+	}	
+ 	else if (gameStage == "P")
+	{
 	// P0 means player0 only needs to place boats (then call bot for placement in a human/bot game)
 	// P1 means player1 only needs to place boats (will only happen in a human/human game)
-	// P2 means both humans need to place; will update to P0 or P1 when someone places
- 	if (gameStage == "P")
-	{
-		console.log("gameStage is " + gameStage + ", user is " + user + ", nextActor is " + nextActor);
+	// P2 means both players need to place; will update to P0 or P1 when someone places
+//	console.log("gameStage is " + gameStage + ", user is " + user + ", nextActor is " + nextActor);
 		if (user == 2)
 		{
 			message = "Players are still placing their ships.";
 			return;
 		}
-		opponent = (user == 1) ? 0 : 1;
-		if (nextActor == 2 || nextActor == user)  // need to place boats
+		playerShips[user] = [];
+		if (nextActor == 2 || nextActor == user)  // user needs to place boats
 		{
-			message = "Use the buttons to select a ship to place.";
+			message = "Use the buttons to select a ship; click on the grid to place it.";
 			shipButtons = [];
 			for (var i = 0; i < 5; i++)
 			{
 				shipButtons[i] = new tmButton(430, TOPMARGIN + 10 + 50 * (i + 1), buttonColor, 40, 40, (i + 1), 32);
 				shipButtons[i].yLabel = 2;
+				playerShips[user][i] = new objShip(user, i);
+				playerShips[user][i].takeAction(1);					// deselect it
 			}
 			placeButtons();
 		}
 		else 
 		{
-			if (isNaN(id2[selectedGame]))
+			message = "Waiting for " + playerNames[opponent] + " to place ships.";
+			var charCounter = 0;
+//		console.log("datastring is " + dataString);
+			for (var i = 0; i < 5; i++)
 			{
-				message = "Click CALL to let " + playerNames[opponent] + " hide ships.";
-				fireButton = new tmButton(400, TOPMARGIN, actionColor, 100, 50, "CALL", 24);	
+				var str = dataString.substr(charCounter, 3);
+				charCounter += 3;
+				var r = str.substr(0,1) * 1;
+				var c = str.substr(1,1) * 1;
+				var h = str.substr(2,1) * 1;
+//			console.log("Ship " + i + " will be placed at " + str + ", r is " + r + ", c is " + c + ", h is " + h);
+				playerShips[user][i] = new objShip(user, i);
+				playerShips[user][i].place(r, c, h);
+				playerShips[user][i].takeAction(1);					// deselect it
 			}	
-			else
-			{	
-				message = "Waiting for " + playerNames[opponent] + " to place ships.";
-			}	
-			return;
 		}
 	}
+}
+function fireReady()
+{
+	if (gameStage == "A")
+	{
+		if (nextActor == user)
+		{
+			if (playerShots[user] == shotsFired)
+			{
+				fireButton = new tmButton(400, TOPMARGIN, actionColor, 100, 50, "FIRE", 28);	
+				return;
+			}	
+		}
+		fireButton = null;	
+	}	
 }
 function placeButtons()
 {
@@ -353,12 +413,22 @@ function render()
 		for (var i = 0; i < 2; i++)
 		{
 			printText(playerNames[i], xTEXT + (i * COLUMNTWO), 5, getColorBLACK(), 32);
-			printText(playerShots[i] + " shots", xTEXT + (i * COLUMNTWO), 50, getColorBLACK(), 32);
+			if (gameStage == "A")
+			{	
+				printText(playerShots[i] + " shots", xTEXT + (i * COLUMNTWO), 50, getColorBLACK(), 32);
+			}	
 			for (var j = 0; j < GRIDSIZE; j++)
 			{
 				for (var k = 0; k < GRIDSIZE; k++)
 				{
-					playerBoards[i][j][k].draw();
+					if (gameStage == "O")
+					{	
+						playerBoards[i][j][k].draw(3);
+					}	
+					else
+					{	
+						playerBoards[i][j][k].draw(user);
+					}	
 				}	
 			}
 		}
@@ -388,66 +458,71 @@ function mouseClick(event)
 	var rect = canvas.getBoundingClientRect();
 	currentX = event.clientX - rect.left;
 	currentY = event.clientY - rect.top;
-//console.log("mouse clicked, selectedShip is " + selectedShip + " " + currentX + ", " + currentY);
 	if (fireButton != null)
 	{
-		if (gameStage == "P")
+		if (gameStage == "A")
 		{
 			if (fireButton.clicked(currentX, currentY))
 			{
-				if ("CALL" == fireButton.label)
+				document.gameForm.gm.value = selectedGame;
+				var shots = "S" + user;
+				for (var j = 0; j < GRIDSIZE; j++)
 				{
-					var formElement = document.querySelector("gameForm");
-					var formData = new FormData(formElement);
-					var request = new XMLHttpRequest();
-					request.open("POST", id2[selectedGame]);
-					formData.append("game", selectedGame);
-					formData.append("action", "P");
-					request.send(formData);	
-					document.reloadForm.ac.value = statusChars + selectedGame;
-					document.reloadForm.submit();
+					for (var k = 0; k < GRIDSIZE; k++)
+					{
+//					console.log("user is " + user + ", row " + j + " col " + k + ", status is " + playerBoards[user][j][k].status);
+						if (playerBoards[opponent][j][k].status == SELECTED)
+						{
+							shots += "" + j + "" + k;
+							console.log(shots);
+						}	
+					}
 				}	
-				else if (window.confirm("This is where you want to hide your ships?") == true) 
+				document.gameForm.ac.value = shots;
+//			console.log("form is: " + document.gameForm.ac.value)
+				document.gameForm.submit();
+			}	
+		}		
+		else if (gameStage == "P")
+		{
+			if (fireButton.clicked(currentX, currentY))
+			{
+				if (window.confirm("This is where you want to hide your ships?") == true) 
 				{
-					var formElement = document.querySelector("gameForm");
-					var formData = new FormData(formElement);
-					var request = new XMLHttpRequest();
-					request.open("POST", "battleship.php");
-					formData.append("pid",document.reloadForm.id.value);
-					formData.append("game", selectedGame);
-					var ships = "P";
+					document.gameForm.gm.value = selectedGame;
+					var ships = "P" + user;
 					for (var i = 0; i < 5; i++)
 					{
 						ships += playerShips[user][i].startCoor.row;
 						ships += playerShips[user][i].startCoor.col;
 						ships += playerShips[user][i].horizontal;
 					}	
-//					console.log("posting " + ships);
-					formData.append("action", ships);
-					request.send(formData);	
-					document.reloadForm.ac.value = statusChars + selectedGame;
-					document.reloadForm.submit();
+					document.gameForm.ac.value = ships;
+					document.gameForm.submit();
 				}
 			}	
 		}	
-	}	
-	for (var i = 0; i < 5; i++)
-	{
-		if (shipButtons[i] != null)
-		{
-			if (shipButtons[i].clicked(currentX, currentY))
-			{
-				if (selectedShip > -1)
-				{
-					playerShips[user][selectedShip].select();
-				}	
-				selectedShip = i;
-				playerShips[user][i].select();
-				placeButtons();
-				return;
-			}	
-		}	
 	}
+	if (shipButtons != null)
+	{		
+		for (var i = 0; i < 5; i++)
+		{
+			if (shipButtons[i] != null)
+			{
+				if (shipButtons[i].clicked(currentX, currentY))
+				{
+					if (selectedShip > -1)
+					{
+						playerShips[user][selectedShip].select();
+					}	
+					selectedShip = i;
+					playerShips[user][i].select();
+					placeButtons();
+					return;
+				}	
+			}	
+		}
+	}	
 	if (flipButton != null)
 	{
 		if (flipButton.clicked(currentX, currentY))
@@ -467,7 +542,29 @@ function mouseClick(event)
 			{
 				if (playerBoards[i][j][k].clicked(currentX, currentY))
 				{
-					if (gameStage == "P")
+//				console.log("clicked on grid " + i + ", row " + j + ", col " + k);
+					if (gameStage == "A")
+					{
+						if (nextActor == user && i == opponent)
+						{
+							if (playerBoards[i][j][k].status == UNTESTED)
+							{
+								if (shotsFired < playerShots[user])
+								{
+									playerBoards[i][j][k].status = SELECTED;
+									console.log("selected grid " + i + ", row " + j + ", col " + k + ", status is " + playerBoards[i][j][k].status);
+									shotsFired += 1;
+								}	
+							}	
+							else if (playerBoards[i][j][k].status == SELECTED)
+							{
+								playerBoards[i][j][k].status = UNTESTED;
+								shotsFired -= 1;
+							}
+							fireReady();	
+						}
+					}	
+					else if (gameStage == "P")
 					{
 						if (i == user)
 						{

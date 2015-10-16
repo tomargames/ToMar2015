@@ -1,151 +1,264 @@
 <?php
 require 'bFunctions.php';
-$log=fopen('gamesLog.txt','w'); 
-//rch * 5, then untested board - 35 bytes
-$dummy = "110120130140150";
-$playerBoard = "00000000000000000000";
-$games = gamesFromXML(0);
-writeGameXML($games,"B");
-$action = $_POST["action"];				// you will always have an action
-if ($action != null)
+$id = $_POST["id"];
+$nm = $_POST["nm"];
+$ac = $_POST["ac"];
+$gm = $_POST["gm"];	// will not have for actions Connect and Accept, will have for Place and Shoot
+date_default_timezone_set("America/New_York");
+$log=fopen('log'.date("ymd").'.txt','a'); 
+$gameId = null;
+?>
+<html>
+<form name="gameForm" method="post" action="../BattleShip/">
+<input type="hidden" name="ac">
+<input type="hidden" name="gm">
+<input type="hidden" name="id" value="<?php echo $id; ?>">
+<input type="hidden" name="nm" value="<?php echo $nm; ?>">
+</form>
+<?php
+if ($ac == null)
 {
-	fwrite($log,"action = ".$action."\n"); 
-	if (firstChar($action) == "C")
-	{	
-		$games = createGame($log, $dummy.$playerBoard, $games, substr($action, 1, 1));		// will be 0 for bot, 1 for human player
-	}	
-	else 
-	{	
-		$k = "'".$_POST["game"]."'";
-		fwrite($log,"game key is ".$k."\n"); 
-		$game = $games[$k];
-		fwrite($log,"found game ".$game->getTSP()."\n"); 
-		$pid = $_POST["pid"];
-		fwrite($log,"pid is ".$pid."\n"); 
-		if (firstChar($action) == "A")
+	writeToLog(false, "action is null, bailing");
+}
+else
+{
+	$games = gamesFromXML();
+	writeGameXML($games,"B");					// back up xml before run
+	if ($ac == "C")
+	{
+		createGame();
+	}
+	else if (validateInput() == true)
+	{
+		$logentry = "ac is ".$ac;
+		if (firstChar($ac) == "A")
 		{	
-			if ($pid == $game->getPID2())
+			$games[$gameId]->Status = ("P2");
+			writeToLog(true, $logentry.", accepted by ".$games[$gameId]->PID2.", set status to P2"); 
+		}
+		else if (firstChar($ac) == "S")
+		{ // second byte is who the user is, and it should equal the nextActor in the game
+			$rel = substr($ac, 1, 1) * 1;
+			$games[$gameId]->unpackStatus();
+			if ($rel == $games[$gameId]->nextActor)
 			{
-				fwrite($log,$pid." accepted the game, setting status to P2.\n"); 
-				$game->setStatus("P2".$dummy.$playerBoard.$dummy.$playerBoard);	//both players need to place boats
-			}
-			else
-			{
-				fwrite($log,$pid." did not match ".$game->getPID2().", game not accepted.\n"); 
-			}	
-		}	
-		else if (firstChar($action) == "P")
-		{
-			$p0 = $game->getP1();
-			fwrite($log,"p0 is ".$p0."\n"); 
-			$p1 = $game->getP2();
-			fwrite($log,"p1 is ".$p1."\n"); 
-			$n0 = $game->getPID1();
-			fwrite($log,"p0 is ".$n0."\n"); 
-			$n1 = $game->getPID2();
-			fwrite($log,"p1 is ".$n1."\n"); 
-			if ($game->getStage() == "P")				// otherwise you shouldn't be here at all
-			{
-				if ($pid == $game->getPID1())
+				$shotString = substr($ac, 2);
+				if (is_numeric($shotString))
 				{
-					if ($game->getActor() != 1)    // if it's 0 or 2, this person needs to place
-					{
-						$p0 = "".substr($action, 1).$playerBoard;
-						fwrite($log,"player0 ship placement is ".$p0."\n");
-						if ($game->getActor() == 2)	 // will update status to P1 so other player can place
+					if (strlen($shotString) == 2 * $games[$gameId]->shipsLeft[$rel])
+					{	
+						$opp = ($rel == 0) ? 1 : 0;
+						$shootingOkay = true;
+						for ($i = 0; $i < $games[$gameId]->shipsLeft[$rel]; $i++)
 						{
-							fwrite($log,"setting status to P1".$p0.$p1."\n");
-							$game->setStatus("P1".$p0.$p1);
+							if ($games[$gameId]->boards[$opp]->shoot(substr($shotString, 0, 2)) == true)
+							{
+								$shotString = substr($shotString, 2);
+							}
+							else
+							{
+								writeToLog(false, $logentry.", shot ".$i." not UNTESTED");
+								$shootingOkay = false;
+								break;
+							}		
 						}
-						else					// all ships are placed, go to A status and pick who goes first	
+						if ($shootingOkay == true)
 						{
-							fwrite($log,"all ships are placed, setting status to A.\n"); 
-							$game->setStatus("A".mt_rand(0, 1).$p0.$p1);
+							$returnStatus = "A".$opp;						// opponent will play next
+							for ($player = 0; $player < 2; $player++)
+							{
+								// transfer the 15 bytes of ship placement directly from current status
+								$returnStatus = $returnStatus.substr($games[$gameId]->Status, 2 + ($player * 35), 15);
+								$returnStatus = $returnStatus.$games[$gameId]->boards[$player]->packStatus();
+							}	
+							$games[$gameId]->Status = $returnStatus;
+						}	
+						writeToLog($shootingOkay, $logentry.", player".$rel." shot, indicator is ".$shootingOkay);
+						// before ending the turn, check to see if all boats were sunk
+						$games[$gameId]->unpackStatus();
+						if ($games[$gameId]->shipsLeft[0] == 0)
+						{
+							$games[$gameId]->Status = "O1".substr($games[$gameId]->Status, 2);
+						}	
+						else if ($games[$gameId]->shipsLeft[1] == 0)
+						{
+							$games[$gameId]->Status = "O0".substr($games[$gameId]->Status, 2);
+						}	
+						// this is where code to call bot player will go
+						else if ($rel == 0 && !is_numeric($games[$gameId]->PID2))	// if it is bot's turn
+						{
+							writeGameXML($games,"A");
+							$p2 = "'".$games[$gameId]->PID2."'";
+							$games[$gameId]->unpackStatus();
+							$s2 = "S".$games[$gameId]->deliverToClient(1);
+							echo '<script> document.gameForm.action = '.$p2.'; document.gameForm.ac.value = "'.$s2.'"; document.gameForm.gm.value = "'.$gm.'"; document.gameForm.submit(); </script>';
+							$gameId = null;	
 						}
-					}
+					}	
 					else
 					{
-						fwrite($log,"user has already placed ships!\n"); 
-					}
-				}	
-				else if ($pid == $game->getPID2())
-				{
-					if ($game->getActor() != 0)    // if it's 1 or 2, this person needs to place
-					{
-						$p1 = "".substr($action, 1).$playerBoard;
-						fwrite($log,"player1 ship placement is ".$p1."\n");
-						if ($game->getActor() == 2)	 // will update status to P0 so other player can place
-						{
-							fwrite($log,"setting status to P0".$p0.$p1."\n");
-							$game->setStatus("P0".$p0.$p1);
-						}
-						else					// all ships are place, go to A status and pick who goes first	
-						{
-							fwrite($log,"all ships are placed, setting status to A.\n"); 
-							$game->setStatus("A".mt_rand(0, 1).$p0.$p1);
-						}
-					}
-					else
-					{
-						fwrite($log,"user has already placed ships!\n"); 
-					}
+						writeToLog(false, $logentry.", shotstring ".$shotString." not correct length of ".(2 * $games[$gameId]->shipsLeft[$rel]));
+					}		
 				}
 				else
 				{
-					fwrite($log,"pid did not match any game participant!\n"); 
-				}
-			}	
+					writeToLog(false, $logentry.", shotstring ".$shotString." not numeric");
+				}		
+			}
 			else
 			{
-				fwrite($log, "game stage of ".$game->getStage()." did not match action of P.\n");
-			}	
+				writeToLog(false, $logentry.", mismatch of nextActor to rel");
+			}		
+		}	
+		else if (firstChar($ac) == "P")
+		{
+			if (validateShips(substr($ac, 2)) == true)
+			{	
+				// look at the status of the game, which players need to place boats, make sure it matches
+				$st = substr($games[$gameId]->Status, 0, 2);  // first 2 chars
+				if ($st == "P2")					// both players need to place
+				{
+					if ($user == 0)
+					{
+						$games[$gameId]->Status = ("P1".substr($ac,2));
+						writeToLog(true, $logentry.", player0 placed ships, status is P1".substr($ac, 2)); 
+						// this is where code to call bot player will go
+						if (!is_numeric($games[$gameId]->PID2))		// will be true if player1 is a bot
+						{
+							writeGameXML($games,"A");
+							$p2 = "'".$games[$gameId]->PID2."'";
+							echo '<script> document.gameForm.action = '.$p2.'; document.gameForm.ac.value = "P'.$gm.'"; document.gameForm.submit(); </script>';
+							$gameId = null;	
+						}
+					}
+					else
+					{
+						$games[$gameId]->Status = ("P0".substr($ac,2));
+						writeToLog(true, $logentry.", player1 placed ships, status is P0".substr($ac, 2)); 
+					}	
+				}
+				else if (($st == "P1" && $user == 1) || ($st == "P0" && $user == 0))	
+				{ // this player's ships are in substr($ac, 2) 
+					// other player's ships are in substr($games[$gameId]->getStatus(), 2)
+					// status will be A then playerToGoFirst then player0 35 (15 plus 20) then player1 35
+					$sts[$user] = substr($ac, 2)."00000000000000000000";
+					$sts[$opp] = substr($games[$gameId]->Status, 2)."00000000000000000000";
+					$firstPlayer = mt_rand(0, 1);
+					$games[$gameId]->Status = ("A".$firstPlayer.$sts[0].$sts[1]);
+					writeToLog(true, $logentry.", all ships placed, status set to ".$games[$gameId]->Status); 
+					if ($firstPlayer == 1)
+					{
+						// this is where code to call bot player will go
+						if (!is_numeric($games[$gameId]->PID2))		// will be true if player1 is a bot
+						{
+							writeGameXML($games,"A");
+							$p2 = "'".$games[$gameId]->PID2."'";
+							$games[$gameId]->unpackStatus();
+							$s2 = "S".$games[$gameId]->deliverToClient(1);
+							echo '<script> document.gameForm.action = '.$p2.'; document.gameForm.ac.value = "'.$s2.'"; document.gameForm.gm.value = "'.$gm.'"; document.gameForm.submit(); </script>';
+							$gameId = null;	
+						}
+					}	
+				}
+				else
+				{
+					writeToLog(false, $ac." action could not be performed, game status was ".$st); 
+				}	
+			}
+			else
+			{
+				writeToLog(false, $ac." ship placement not valid"); 
+			}			
 		}
 		else
 		{
-			fwrite($log, "unrecognized action.\n");
-		}	
-	}	
-	writeGameXML($games,"A");
-}	
-else
-{
-	fwrite($log, "action was null.\n");
-}	
-fclose($log); 	
-
-function createGame($log, $board, $games, $type)
-{
-	$pid1 = $_POST["pid1"];
-	$pid2 = $_POST["pid2"];
-	$name1 = $_POST["name1"];
-	$name2 = $_POST["name2"];
-	$tsp = $_POST["tsp"];
-	fwrite($log,"creating new game\n".$pid1."\n".$pid2."\n".$tsp."\n"); 
-	$games[$pid1.$tsp] = new bGame();
-	$games[$pid1.$tsp]->setPID1($pid1); 
-	$games[$pid1.$tsp]->setPID2($pid2); 
-	$games[$pid1.$tsp]->setName1($name1); 
-	$games[$pid1.$tsp]->setName2($name2); 
-	$games[$pid1.$tsp]->setTSP($tsp);
-	// /*first byte of status is gameStage (Connecting, Placing, Active, or Inactive)
-	// -- if playing a bot(type == 0), connection is assumed, so status will be P
-	// -- if playing a human(type == 1), status will be C until second player accepts game
-	// C  means two-human game, player1 needs to accept
-	// P0 means player0 only needs to place boats 
-	// P1 means player1 only needs to place boats 
-	// P2 means both humans need to place; will update to P0 or P1 when someone places
-	// second byte of status is playerNumber whose action is required next (2 for either/both)
-	// next 35 bytes are player0, then 35 bytes for player1 */
-	if ($type == "0")
+			writeToLog(false, $ac." action could not be performed, unknown action.");
+		}
+	}
+	if ($gameId != null)				// if you are sending to a bot, set gameId to null to bypass this ending
 	{
-		$status = "P2".$board.$board;	//player0 will place boats next
+		writeGameXML($games,"A");
+		echo '<script> document.gameForm.ac.value = '.$gameId.'; 	document.gameForm.submit(); </script>';
+//	echo '<script> document.gameForm.ac.value = '.$gameId.';  </script>';
 	}	
-	else
-	{	
-		$status = "C";														//player1 must connect
-	}	
-	fwrite($log,"setting status to ".$status."\n"); 
-	$games[$pid1.$tsp]->setStatus($status);
-	return $games;
 }	
+fclose($log);
+function validateShips($shipString)
+{
+	$board = new bBoard();
+	$board->createBoard();
+	$charCounter = 0;
+	for ($s = 0; $s < 5; $s++)
+	{
+		$str = substr($shipString, $charCounter, 3);
+		$charCounter += 3;
+		if ($board->place($s, $str, "P") == false)
+		{	
+			return false;
+		}
+	}
+	return true;
+}
+function validateInput()
+{	// will validate ac and gm, will use id and games[gameId] to populate user and opp
+	global $ac, $gm, $id, $gameId, $user, $opp, $games;
+	
+	if (firstChar($ac) == "A")				// don't need user and opp for Accept
+	{
+		$gm = substr($ac, 1);
+	}	
+	if ($gm == null)
+	{
+		writeToLog(false, $ac." action could not be performed, no game specified"); 
+		return false;
+	}	
+	$gameId = "'".$gm."'";
+	if ($games[$gameId] == null)
+	{
+		writeToLog(false, $ac." action could not be performed, could not find game record for ".$gameId); 
+		$gameId = null;
+		print_r($games);
+		return false;
+	}
+	if (firstChar($ac) == "A")				// don't need user and opp for Accept
+	{
+		return true;
+	}	
+	$user = substr($ac, 1, 1) * 1;	// player number placing boats, game status should match up
+	$opp = ($user == 0) ? 1 : 0;
+	return true;
+}
+function createGame()
+{
+	global $games, $gameId, $id, $nm;
+	$tsp = date("ymdhis");					// timestamp for gameId
+	$g = "G".$id."T".$tsp;
+	$gameId = "'G".$id."T".$tsp."'";
+	$games[$gameId] = new bGame();
+	$games[$gameId]->PID1 = ($id); 
+	$games[$gameId]->PID2 = ($_POST["pid2"]); 
+	$games[$gameId]->Name1 = ($nm); 
+	$games[$gameId]->Name2 = ($_POST["name2"]); 
+	$games[$gameId]->TSP = ($tsp);
+	$games[$gameId]->Status = ("C");
+	writeToLog(true, "created game with ".$games[$gameId]->PID2);
+	if (!is_numeric($games[$gameId]->PID2))				// will be true if player1 is a bot
+	{
+		writeGameXML($games,"A");
+		$p2 = "'".$games[$gameId]->PID2."'";
+		echo '<script> document.gameForm.action = '.$p2.'; document.gameForm.ac.value = "A'.$g.'"; document.gameForm.submit(); </script>';
+		$gameId = null;	
+	}
+}
+function writeToLog($ok, $msg)
+{
+	global $log, $gameId, $gm;
+	fwrite($log, date("ymdhis")." ".$gm.": ".$msg."\n"); 
+	if (!$ok)
+	{
+		echo $gameId.": ".$msg;
+		$gameId = null;
+	}	
+}
 ?>
+</html>

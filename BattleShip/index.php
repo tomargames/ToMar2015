@@ -2,10 +2,11 @@
 require 'bFunctions.php';
 
 // Step1: get id and name from post -- if no ID, require sign-in
+// battleship.php will always send back id, nm, and ac. no ac means you just came in
 $id = $_POST["id"];
 $nm = $_POST["nm"];
 $ac = $_POST["ac"];
-//echo "ac value is ".$ac."<br>";
+
 $registered = false;
 if ($id == "")
 {
@@ -29,7 +30,7 @@ else
 }	
 if ($player == null)
 {
-	$registerPlayer = '<input type="button" onClick="newPlayer();" value="Register to play">';
+	$registerPlayer = '<input type="button" style="background: #6666FF" onClick="newPlayer();" value="Register to play">';
 }	
 else
 {
@@ -37,80 +38,74 @@ else
 	$registerPlayer = $player->getName();
 }
 $bots = BotsFromXML();
-$games = gamesFromXML(1);
+$games = getGames($id);
 //print_r($games);
-// Step4: if no action, then no game selected
-if ($ac == null)
-{
-	$selectedGame = "''";
-}
-else
-{
-	$st = substr($ac, 0, 2);
-	$selectedGame = "'".substr($ac, 2)."'";
-	echo "st is ".$st.", selectedGame is ".$selectedGame."<br>";
-	if ("C" == firstChar($ac))										// first reload since game creation
-	{
-		while ($games[$selectedGame] == null)
-		{
-			$games = gamesFromXML(1);
-		}
-	}
-	else							// all others, you want to make sure the status has changed since you acted
-	{
-		if ($games[$selectedGame] != null)
-		{	
-			while (substr($games[$selectedGame]->getStatus(), 0, 2) == $st)
-			{
-//			echo substr($games[$selectedGame]->getStatus(), 0, 2)."<br>";
-				$games = gamesFromXML(1);
-			}
-		}	
-	}	
-}
 ?>
 <html>
 <head>
 	<title>BattleShip Playground</title>
 	<script src="../js/utils.js"></script>
 	<LINK REL="StyleSheet" HREF="../styles.css?<?php echo rand(); ?>"  TYPE="text/css" TITLE="ToMar Style" MEDIA="screen">
-	<script>
-		var gameButtons = [];
-		var names = [];
-		var id2 = [];
-		var strings = [];
-		var rels = [];
+<?php 
+// Step4: if no action, then no game selected
+if ($ac == null)
+{
+	$selectedGame = "''";
+}
+else if (firstChar($ac) == "E")
+{
+	echo 'ERROR: '.substr($ac, 1);
+}
+else if (firstChar($ac) == "G")
+{
+	$selectedGame = "'".$ac."'";
+}
+?>
+<script>
+var gameButtons = [];
+var names = [];
+var strings = [];
+var rels = [];
 <?php
-	echo 'var selectedGame = '.$selectedGame.'; ';
-	if (count($games) > 0)
-	{	
-		foreach ($games as $g)
+echo 'var selectedGame = '.$selectedGame.'; ';
+if (count($games) > 0)
+{	
+	foreach ($games as $g)
+	{
+		echo 'strings['.$g->getPassKey().'] = "'.$g->Status.'"; ';
+		echo 'names['.$g->getPassKey().'] = []; ';
+		echo 'names['.$g->getPassKey().'][0] = "'.$g->Name1.'"; ';
+		echo 'names['.$g->getPassKey().'][1] = "'.$g->Name2.'"; ';
+		echo 'rels['.$g->getPassKey().'] = '.$g->getRel($id).'; ';
+//	echo 'actor = '.$g->getActor().'; ';
+		$buttonString = '<input type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
+		if ("C" == $g->getStage())
 		{
-			echo 'strings['.$g->getPassKey().'] = "'.$g->getStatus().'"; ';
-			echo 'id2['.$g->getPassKey().'] = "'.$g->getPID2().'"; ';
-			echo 'names['.$g->getPassKey().'] = []; ';
-			echo 'names['.$g->getPassKey().'][0] = "'.$g->getName1().'"; ';
-			echo 'names['.$g->getPassKey().'][1] = "'.$g->getName2().'"; ';
-			$buttonString = '<input type=button onClick=selectGame('.$g->getPassKey().'); value=Select>';
-			if ($g->getPID1() == $id)
+			if  ($g->getRel($id) == 1)
+			{	
+				$buttonString = '<input style=\'background: #FF3399\' type=button onClick=acceptGame('.$g->getPassKey().'); value=Accept>';
+			}
+			else if ($g->getRel($id) == 0)
 			{
-				echo 'rels['.$g->getPassKey().'] = 0; ';
+				$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
 			}	
-			else if ($g->getPID2() == $id)
-			{
-				echo 'rels['.$g->getPassKey().'] = 1; ';
-				if ("C" == $g->getStage())
-				{
-					$buttonString = '<input type=button onClick=acceptGame('.$g->getPassKey().'); value=Accept>';
-				}
-			}	
-			else
-			{
-				echo 'rels['.$g->getPassKey().'] = 2; ';
-			}	
-			echo 'gameButtons['.$g->getPassKey().'] = "'.$buttonString.'"; ';
 		}
-	}	
+		else if ($g->getRel($id) == 2 || $g->getStage() == "O")
+		{
+			$buttonString = '<input style=\'background: #CCCCFF\' type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
+		}
+		else if ($g->getRel($id) == $g->getActor())
+		{
+			$buttonString = '<input style=\'background: #33CC33\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
+		}
+		else
+		{
+			$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
+		}
+		echo 'gameButtons['.$g->getPassKey().'] = "'.$buttonString.'"; ';
+		$buts[$g->getPassKey()] = $buttonString;
+	}
+}
 ?>		
 	</script>
 </head>
@@ -120,14 +115,14 @@ else
 	<td  width="40%" class="biggest">BattleShip Playground</td>
 	<td width="30%" class="magenta10">by ToMarGames</td></tr>
 </table>
-<table border="0" align="center"><tr>
+<table border="0" align="center"><tr valign="top">
 <td width="30%" align="left">
 	<form name="menuForm" action="../" method="post">			
-	<input type="hidden" name="id" value="<?php echo $id; ?>">
-	<input type="hidden" name="nm" value="<?php echo $nm; ?>">
-	<input type="submit" value="ToMarGames Menu"><br><br>	
+		<input type="hidden" name="id" value="<?php echo $id; ?>">
+		<input type="hidden" name="nm" value="<?php echo $nm; ?>">
+		<input type="submit" style="background: #6666FF" value="ToMarGames Menu">
 	</form>
-	<br><br>
+	<br>
 	<table border=1>
 		<tr><td colspan="5" class="magentah">Games</td></tr>
 <?php
@@ -139,15 +134,11 @@ else
 			{	
 				$playButton = "";
 			}	
-			else if ($g->getStage() == "C" && $g->getPID2() == $id)
-			{	
-				$playButton = '<input type="button" onClick="acceptGame('.$g->getPassKey().');" value="Accept">';
-			}		
 			else
 			{	
-				$playButton = '<input type="button" onClick="selectGame('.$g->getPassKey().');" value="Select">';
+				$playButton = $buts[$g->getPassKey()];
 			}		
-			echo "<tr><td class='green10'>".$g->getName1()."</td><td class='green10'>".$g->getName2()."</td><td class='green10'>".$g->getStage()."</td><td id=".$g->getPassKey().">".$playButton."</td></tr>";
+			echo "<tr><td class='green10'>".$g->Name1."</td><td class='green10'>".$g->Name2."</td><td class='green10'>".$g->getStage()."</td><td id=".$g->getPassKey().">".$playButton."</td></tr>";
 		}	
 	}	
 ?>	
@@ -162,7 +153,7 @@ else
 		{
 				$tId = "'".$p->getId()."'";
 				$tName = "'".$p->getName()."'";
-				$playButton = '<input type="button" onClick="startGame('.$tId.','.$tName.', 1);" value="Challenge">';
+				$playButton = '<input type="button" style="background: #6666FF" onClick="startGame('.$tId.','.$tName.');" value="Challenge">';
 		}
 		else 
 		{
@@ -185,7 +176,7 @@ else
 			{
 				$tId = "'".$p->getId()."'";
 				$tName = "'".$p->getName()."'";
-				$playButton = '<input type="button" onClick="startGame('.$tId.','.$tName.', 0);" value="Start Game">';
+				$playButton = '<input type="button" style="background: #6666FF" onClick="startGame('.$tId.','.$tName.');" value="Start Game">';
 			}
 		}		
 		echo "<tr><td class='green10'>".$p->getName()."</td><td>".$playButton."</td></tr>";
@@ -202,12 +193,18 @@ else
 	<script src="battleship.js"></script>
 </div>
 </td></tr></table>
-<form name="reloadForm" action="../BattleShip/" method="post">			
+<form name="reloadForm" method="post">
+<input type="hidden" name="ac">
 <input type="hidden" name="id" value="<?php echo $id; ?>">
 <input type="hidden" name="nm" value="<?php echo $nm; ?>">
-<input type="hidden" name="ac">
 </form>
-<form name="gameForm" method="post">			
+<form name="gameForm" method="post" action="battleship.php">
+<input type="hidden" name="ac">
+<input type="hidden" name="gm">
+<input type="hidden" name="id" value="<?php echo $id; ?>">
+<input type="hidden" name="nm" value="<?php echo $nm; ?>">
+<input type="hidden" name="pid2">
+<input type="hidden" name="name2">
 </form>
 <script>
 <?php 
@@ -216,38 +213,20 @@ if ($selectedGame != "''")
 	echo 'populateDisplay('.$selectedGame.'); ';
 }	
 ?>	
-function startGame(opp, name, type)
+function startGame(opp, name)
 {
 	if (window.confirm("Start a game with " + name + "?") == true) 
 	{
-		var formElement = document.querySelector("gameForm");
-		var formData = new FormData(formElement);
-		var request = new XMLHttpRequest();
-		var tsp = Date.now();
-		request.open("POST", "battleship.php");
-		formData.append("pid1","<?php echo $id ?>");
-		formData.append("pid2", opp);
-		formData.append("name1","<?php echo $nm ?>");
-		formData.append("name2", name);
-		formData.append("tsp", tsp);
-		formData.append("action", "C" + type);
-		request.send(formData);	
-		document.reloadForm.ac.value = "C G<?php echo $id ?>T" + tsp;
-		document.reloadForm.submit();
+		document.gameForm.pid2.value = opp;
+		document.gameForm.name2.value = name;
+		document.gameForm.ac.value = "C";
+		document.gameForm.submit();
 	}	
 }
 function acceptGame(passKey)
 {
-	var formElement = document.querySelector("gameForm");
-	var formData = new FormData(formElement);
-	var request = new XMLHttpRequest();
-	request.open("POST", "battleship.php");
-	formData.append("pid","<?php echo $id ?>");
-	formData.append("game", passKey);
-	formData.append("action", "A");
-	request.send(formData);	
-	document.reloadForm.ac.value = "A " + passKey;
-	document.reloadForm.submit();
+	document.gameForm.ac.value = "A" + passKey;
+	document.gameForm.submit();
 }
 function selectGame(passKey)
 {
