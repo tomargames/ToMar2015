@@ -5,16 +5,17 @@ class bBoard
 {
 	public static $lengths = array(5, 4, 3, 3, 2);
 	public $board = null;
-	public function createBoard()
+	public static function makeBoard()
 	{
+		$b = new bBoard();
 		for ($row = 0; $row < 10; $row++)
 		{
 			for ($col = 0; $col < 10; $col++)
 			{
-				$this->board[$row][$col] = new bSquare();
-				$this->board[$row][$col]->createSquare($row, $col);
+				$b->board[$row][$col] = bSquare::makeSquare($row, $col);
 			}
 		}	
+		return $b;
 	}
 	public function packStatus()
 	{
@@ -137,12 +138,14 @@ class bSquare
 	public $col;
 	public $status;
 	public $contents;
-	public function createSquare($r, $c)
+	public static function makeSquare($r, $c)
 	{
-		$this->row = $r;
-		$this->col = $c;
-		$this->status = 0;
-		$this->contents = 0;
+		$s = new bSquare();
+		$s->row = $r;
+		$s->col = $c;
+		$s->status = 0;
+		$s->contents = 0;
+		return $s;
 	}
 	public function mask()
 	{ // if square is untested, just return it; otherwise, show hit or miss
@@ -166,28 +169,19 @@ class bSquare
 	}
 }
 class bPlayer 
-{ 
-	public $ID = null;
-	public function setID($x) { $this->ID = $x; }
-	public function getID() { return $this->ID; }
-	public $Name = null;
-	public function setName($x) { $this->Name = $x; }
-	public function getName() { return $this->Name; }
-}
-class bBot
 {
-	public $ID = null;
-	public function setID($x) { $this->ID = $x; }
-	public function getID() { return $this->ID; }
-	public $Name = null;
-	public function setName($x) { $this->Name = $x; }
-	public function getName() { return $this->Name; }
-	public $URL = null;
-	public function setURL($x) { $this->URL = $x; }
-	public function getURL() { return $this->URL; }
-	public $Dev = null;
-	public function setDev($x) { $this->Dev = $x; }
-	public function getDev() { return $this->Dev; }
+	public $ID = null;								// humans have numeric ID, bots have URL as ID
+	public $name = null;
+	public $dev = null;								// if filled with an ID, bot is in test mode, no stats kept
+	public $gameCount = 0;
+	public $winCount = 0;
+	public function makePlayer($ID, $name)
+	{
+		$p = new bPlayer();
+		$p->ID = $ID;
+		$p->name = $name;
+		return $p;
+	}
 }
 class bGame
 {
@@ -221,8 +215,7 @@ class bGame
 		for ($player = 0; $player < 2; $player++)
 		{
 			$this->shipsLeft[$player] = 0;
-			$this->boards[$player] = new bBoard();
-			$this->boards[$player]->createBoard();
+			$this->boards[$player] = bBoard::makeBoard();
 			$this->boards[$player]->markHits(substr($this->Status, 2 + ($player * 35) + 15, 20));
 			for ($s = 0; $s < 5; $s++)
 			{
@@ -255,47 +248,25 @@ class bGame
 		}	
 	}
 }
-function HumansFromXML() 	
-{ 
- 	$returnArray = null; 
-	$table = simplexml_load_file('humans.xml');
-	foreach($table->children() as $record)	
-	{ 
- 		$x = new bPlayer();
- 		foreach($record->children() as $attr) 
- 		{ 
-  		if ($attr->getName() == 'ID') 
-  		{ 
- 				$x->setID(trim($attr)); 
- 			}  
-  		else if ($attr->getName() == 'Name') 
-  		{ 
- 				$x->setName(trim($attr)); 
- 			}  
- 		}
-		$returnArray[$x->getID()] = $x; 
- 	} 
-	$newArray = null; 
-	usort($returnArray, 'sortArray'); 
-	foreach($returnArray as $r)  
-	{  	
-		$newArray[$r->getID()] = $r;  
-	} 
-	return $newArray; 
-} 
-function writeHumanXML($arr)	
+function writePlayerXML($arr, $fileName)	
 {
-	$xmlString = "<?xml version='1.0' encoding='ISO-8859-1'?><root>";
+	$xmlString = "<root>";
  	foreach ($arr as $a) 
  	{ 
  		$t1 = '<Player>';
-	 	$t1 = $t1.'<ID>'.$a->getID().'</ID>'; 
-	 	$t1 = $t1.'<Name>'.$a->getName().'</Name>'; 
+	 	$t1 = $t1.'<ID>'.$a->ID.'</ID>'; 
+	 	$t1 = $t1.'<name>'.$a->name.'</name>'; 
+		if ($a->dev != null)
+		{
+			$t1 = $t1.'<dev>'.$a->dev.'</dev>'; 
+		}	
+	 	$t1 = $t1.'<games>'.$a->gameCount.'</games>'; 
+	 	$t1 = $t1.'<wins>'.$a->winCount.'</wins>'; 
 	 	$t1 = $t1.'</Player>'; $xmlString = $xmlString.$t1;
 	} 
 	$xmlString = $xmlString.'</root>'; 
 	$xml2 = str_ireplace('\\','',$xmlString); 
-	$file=fopen('humans.xml','w'); 
+	$file=fopen($fileName,'w'); 
 	fwrite($file,$xml2); 
 	fclose($file); 	
 } 
@@ -323,6 +294,10 @@ function writeGameXML($arr, $type)
 	{	
 		$file=fopen('gamesBackup.xml','w'); 
 	}
+	else if ("O" == $type)
+	{	
+		$file=fopen('gamesArchive.xml','w'); 
+	}
 	else
 	{	
 		$file=fopen('games.xml','w'); 
@@ -330,41 +305,49 @@ function writeGameXML($arr, $type)
 	fwrite($file,$xml2); 
 	fclose($file); 	
 } 
-function BotsFromXML() 	
+function playersFromXML($fileName) 	
 { 
  	$returnArray = null; 
-	$table = simplexml_load_file('bots.xml');
+	$table = simplexml_load_file($fileName);
 	foreach($table->children() as $record)	
 	{ 
- 		$x = new bBot();
+ 		$x = new bPlayer();
  		foreach($record->children() as $attr) 
  		{ 
   		if ($attr->getName() == 'ID') 
   		{ 
- 				$x->setID(trim($attr)); 
+ 				$x->ID = trim($attr); 
  			}  
-  		else if ($attr->getName() == 'Name') 
+  		else if ($attr->getName() == 'name') 
   		{ 
- 				$x->setName(trim($attr)); 
+ 				$x->name = trim($attr); 
  			}  
-  		else if ($attr->getName() == 'Dev') 
+  		else if ($attr->getName() == 'dev') 
   		{ 
- 				$x->setDev(trim($attr)); 
+ 				$x->dev = trim($attr); 
+ 			}  
+  		else if ($attr->getName() == 'games') 
+  		{ 
+ 				$x->gameCount = trim($attr); 
+ 			}  
+  		else if ($attr->getName() == 'wins') 
+  		{ 
+ 				$x->winCount = trim($attr); 
  			}  
  		}
-		$returnArray[$x->getID()] = $x; 
+		$returnArray[$x->ID] = $x; 
  	} 
 	$newArray = null; 
 	usort($returnArray, 'sortArray'); 
 	foreach($returnArray as $r)  
 	{  	
-		$newArray[$r->getID()] = $r;  
+		$newArray[$r->ID] = $r;  
 	} 
 	return $newArray; 
 }
 function getGames($pid) 
 {
-	$games = gamesFromXML();
+	$games = gamesFromXML("A");
 	// if status is anything but A, you don't need to do anything
 	foreach ($games as $g)
 	{
@@ -393,11 +376,27 @@ function getGames($pid)
 	}
 	return $games;
 }
-
-function gamesFromXML()
+function getArchive()
 {
- 	$returnArray = null; 
-	$table = simplexml_load_file("games.xml");
+	$games = gamesFromXML("O");
+	foreach ($games as $g)
+	{
+		$g->unpackStatus();
+		$g->Status = $g->deliverToClient(3);
+	}
+	return $games;
+}
+function gamesFromXML($type)
+{
+ 	$returnArray = null;
+	if ($type == "O")
+	{
+		$table = simplexml_load_file("gamesArchive.xml");
+	}	
+	else
+	{
+		$table = simplexml_load_file("games.xml");
+	}	
 	foreach($table->children() as $record)	
 	{ 
  		$x = new bGame();
@@ -443,6 +442,10 @@ function sortArray($f1, $f2)
 	$a = trim($f1->Status);
 	$b = trim($f2->Status);
 	return ($a > $b) ? 1 : -1;
+}
+function gameDate($s)
+{
+	return substr($s, 2, 2)."/".substr($s, 4, 2)."/".substr($s, 0, 2);
 }
 /* $games = getGames('106932376942135580175');
 foreach ($games as $g)

@@ -271,7 +271,7 @@ function populateDisplay(passkey)
 	selectedGame = passkey;
 	playerNames[0] = names[selectedGame][0];
 	playerNames[1] = names[selectedGame][1];
-	user = rels[selectedGame];
+	user = (rels == null) ? 3 : rels[selectedGame];
 	opponent = (user == 1) ? 0 : 1;
 	refreshGrids();
 	fireButton = null;

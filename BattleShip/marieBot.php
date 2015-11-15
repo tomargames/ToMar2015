@@ -1,6 +1,7 @@
 <?php
 $ac = $_POST["ac"];
-//$ac = "SA1520000000000300000000002000000000030000000000200000000000000000000000000000000000000000000000000000005100000000001000aa00000100000000081000000008010000000800044440002222200060000000006000000000600000000"
+//$ac = "SA150000000000000000000000033300000000300000000030000000000000000000000000000000030000000000000000000000500032220300000220230000020203000002002300000200232000022223332002000220200200020002022020000022020000000";
+//$ac = "SA150000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500032220300000220230000020203000002002300000200232000022223332002000220200200020002022020000022020000000";
 ?>
 <html>
 <form name="gameForm" method="post" action="battleship.php">			
@@ -10,40 +11,10 @@ $ac = $_POST["ac"];
 <input type="hidden" name="gm">
 </form>
 <?php
+//echo $ac."<br>";
 $newAc = null;
 $gm = null;
-/*
-<form name="gameForm" method="post" action="http://www.tomargames.com/ToMar2015/BattleShip/battleship.php">			
-	If you would like to create your own Bot player, here are some things to know:
-		1. This is a working player that does everything randomly, and you can feel free to modify it.
-		2. It communicates via the gameForm above, and uses javascript to populate and submit the form.
-		3. This player is written in PHP, and includes the Square and Board classes for your convenience.
-		4. You can use those classes as is, modify them, or throw them out completely.
-		5. Your process only needs to post the appropriate information, by whatever means you choose.
-		6. When you register your Bot (before you start developing), you'll give me a url to post to.
-		7. Your player will live on your own server, so you can collect information as you need it and not bother me.
-		8. Until your Bot is ready for prime time, it will live in Development mode, and will appear only to you.
-		
-	Bot player will accept a post from battleship.php, and will post back to it using gameForm.
-	The id and nm fields will always be filled in, and posted back untouched.
-	(They represent the human player that your Bot is in a game with, and who will see the results.)
-	The gm field will hold the gameId for the Posting and Shooting actions.
-	Bot players will always be player1, playing a human player0.
-	The ac field will be one of the following:
-	A[gameId] -- when a game is created, and you send it back untouched to accept the game
-	P[gameId] -- the response to this is ship placement
-		1. Put the gameId in the gm field (you get it from the ac coming in, after the P)
-		2. Response must start with P1 (signaling that player1's ship placement follows)
-		3. For each of 5 boats, send row(0 - 9), column(0 - 9), and 0 for vertical or 1 for horizontal
-		4. If the ship placement is rejected, you should see an error message on the screen
-	S[nextActor][player0 number of ships][player0 board][player1 number of ships][player1 board]
-		1. SA1 will always be in the first 3 columns
-		2. player0 number of ships will be in column 4, in case you need it
-		3. player0 board is the next 100 columns (5 - 104) -- this is the one you shoot at
-		4. each character represents a square on the board, untested(0), miss(2), or hit(3)
-		5. your number of ships left alive is in column 105, and this is how many shots you get
-		6. the current status of your board follows, starting in column 106
-*/
+$hits = null;
 if (substr($ac, 0, 1) == "A")
 {
 // if A, you just need to accept the game, so post the same ac value back to battleship.php
@@ -58,18 +29,102 @@ else if (substr($ac, 0, 1) == "S")					// you need to send back shots
 	// 0 is untested  2 is a miss   3 is a hit
 	// you are player 1, so character at position 101 is your number of shots
 	$numberOfShots = substr($g, 101, 1) * 1;
+//	echo "number of shots: ".$numberOfShots."<br>";
 	if ($numberOfShots > 0)
 	{	
-		$numberofShipsLeft = substr($g, 0, 1);
+		$numberOfShipsLeft = substr($g, 0, 1) * 1;
+//		echo "number of ships left to sink: ".$numberOfShipsLeft."<br>";
 		$board = Board::makeBoard();
 		$board->markHits(substr($g, 1, 100));
+		$shots = null;								// this is where we'll add potential shots
+		if (count($hits) > 0)
+		{	
+			foreach ($hits as $h)
+			{
+				$h->worked = false;
+			}
+		}
+//		echo "looking at ".count($hits)." hits<br>";
+		while (count($hits) > 0)
+		{	
+			$h = array_shift($hits);
+//			echo "hit is ".$h->show()."<br>";
+			$found = false;
+			for ($i = 0; $i < count($hits); $i++)
+			{
+//				echo "comparing with ".$hits[$i]->show()."<br>";
+				// we're going to compare each hit with the first
+				if ($h->row == $hits[$i]->row)
+				{	
+					if ($h->col == $hits[$i]->col - 1)			// same row, hit is to the east
+					{		// shoot to the west of 0, and to the east of i
+						$shots[count($shots)] = $board->board[$hits[$i]->row][$hits[$i]->col]->shootEast(); 
+						$shots[count($shots)] = $board->board[$h->row][$h->col]->shootWest(); 
+						$found = $hits[$i]->worked = true;
+//						echo "shot east/west"."<br>";
+					}
+					else if ($h->col == $hits[$i]->col + 1)			// same row, hit is to the west
+					{		// shoot to the west of i, and to the east of 0
+						$shots[count($shots)] = $board->board[$hits[$i]->row][$hits[$i]->col]->shootWest(); 
+						$shots[count($shots)] = $board->board[$h->row][$h->col]->shootEast(); 
+						$found = $hits[$i]->worked = true;
+//						echo "shot west/east"."<br>";
+					}
+				}	
+				else if ($h->col == $hits[$i]->col)
+				{	
+					if ($h->row == $hits[$i]->row - 1)			// same col, hit is to the south
+					{		
+						$shots[count($shots)] = $board->board[$hits[$i]->row][$hits[$i]->col]->shootSouth(); 
+						$shots[count($shots)] = $board->board[$h->row][$h->col]->shootNorth(); 
+						$found = $hits[$i]->worked = true;
+//						echo "shot north/south"."<br>";
+					}
+					else if ($h->row == $hits[$i]->row + 1)			// same col, hit is to the north
+					{		
+						$shots[count($shots)] = $board->board[$hits[$i]->row][$hits[$i]->col]->shootNorth(); 
+						$shots[count($shots)] = $board->board[$h->row][$h->col]->shootSouth(); 
+						$found = $hits[$i]->worked = true;
+//						echo "shot south/north"."<br>";
+					}
+				}
+			}	
+			if ($found == false && $h->worked == false) 				//shoot all around
+			{
+//				echo "shooting all around it"."<br>";
+				$shots[count($shots)] = $board->board[$h->row][$h->col]->shootNorth(); 
+				$shots[count($shots)] = $board->board[$h->row][$h->col]->shootSouth();
+				$shots[count($shots)] = $board->board[$h->row][$h->col]->shootEast(); 
+				$shots[count($shots)] = $board->board[$h->row][$h->col]->shootWest();
+			}	
+		}	
 		$acLen = 2 + 2 * $numberOfShots;
+		$passCounter = 0;
 		do
 		{
-			$sh = Shot::makeShot(mt_rand(0, 9), mt_rand(0, 9));
-			if ($board->shoot($sh) == true)
+			$passCounter += 1;
+			if (count($shots) > 0)
+			{	
+				$sh = array_shift($shots);			// may be a shot, may be null
+			}
+			else
+			{	
+				// if the row is even, the col should be even, or vice versa
+				$nr = mt_rand(0, 9);
+				$nc = mt_rand(0, 9);
+				if ($nc % 2 != $nr % 2)
+				{
+					if ($passCounter < 100)						// after 100 tries, go off-pattern in case out of moves
+					{
+						$nc = ($nc > 0) ? $nc - 1 : $nc + 1;
+					}	
+					$sh = Shot::makeShot($nr, $nc);
+				}	
+			}	
+			if ($sh != null && $board->shoot($sh) == true)
 			{
-				$newAc = $newAc.$sh->row.$sh->col;
+				$newAc = $newAc.$sh->pass();
+//				echo $newAc."<br>";
 			}
 		}	while(strlen($newAc) < $acLen);	
 	}
@@ -78,7 +133,7 @@ else if (substr($ac, 0, 1) == "S")					// you need to send back shots
 		echo "This should not happen, Silly has lost the game.";
 		$newAc = "ERROR";
 	}	
-}
+}	
 else if (substr($ac, 0, 1) == "P")
 {
 // if P, you put your ships after P1 (bot is always player1) in ac
@@ -99,14 +154,21 @@ else if (substr($ac, 0, 1) == "P")
 		$newAc = $newAc.$r.$c.$h;
 	}
 }
-//if you comment out this line, it won't post back to battleship.php
 echo '<script> document.gameForm.ac.value = "'.$newAc.'"; document.gameForm.gm.value = "'.$gm.'"; document.gameForm.submit(); </script>';		
 //echo 'newAc is '.$newAc.'<br>';
-
+		
 class Shot
 {
 	public $row;
 	public $col;
+	public function pass()
+	{
+		return $this->row.$this->col;
+	}
+	public function show()
+	{
+		return $this->row.", ".$this->col;
+	}
 	public static function makeShot($r, $c)
 	{
 		$s = new Shot();
@@ -128,6 +190,7 @@ class Square
 	public $shot;
 	public $status;
 	public $contents;
+	public $worked;
 	public static function makeSquare($r, $c)
 	{
 		$s = new Square();
@@ -172,11 +235,16 @@ class Board
 	}
 	public function markHits($boardString)
 	{
+		global $hits;	
 		for ($row = 0; $row < 10; $row++)
 		{
 			for ($col = 0; $col < 10; $col++)
 			{
 				$this->board[$row][$col]->status = substr($boardString, $row * 10 + $col, 1) * 1;
+				if ($this->board[$row][$col]->status == 3)
+				{
+					$hits[count($hits)] = Shot::makeShot($row, $col);
+				}	
 			}
 		}	
 	}

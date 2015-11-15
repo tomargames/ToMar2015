@@ -1,9 +1,10 @@
 <?php
 $ac = $_POST["ac"];
-//$ac = "SA1520000000000300000000002000000000030000000000200000000000000000000000000000000000000000000000000000005100000000001000aa00000100000000081000000008010000000800044440002222200060000000006000000000600000000"
+//uncomment the following line to simulate input from battleship.php
+//$ac = "SA1520000000000300000000002000000000030000000000200000000000000000000000000000000000000000000000000000005100000000001000aa00000100000000081000000008010000000800044440002222200060000000006000000000600000000";
 ?>
 <html>
-<form name="gameForm" method="post" action="battleship.php">			
+<form name="gameForm" method="post" action="http://www.tomargames.com/ToMar2015/BattleShip/battleship.php">			
 <input type="hidden" name="id" value="<?php echo $_POST["id"]; ?>">
 <input type="hidden" name="nm" value="<?php echo $_POST["nm"]; ?>">
 <input type="hidden" name="ac">
@@ -13,11 +14,11 @@ $ac = $_POST["ac"];
 $newAc = null;
 $gm = null;
 /*
-<form name="gameForm" method="post" action="http://www.tomargames.com/ToMar2015/BattleShip/battleship.php">			
+<form name="gameForm" method="post" action="http://localhost/ToMar2015/BattleShip/battleship.php">			
 	If you would like to create your own Bot player, here are some things to know:
 		1. This is a working player that does everything randomly, and you can feel free to modify it.
 		2. It communicates via the gameForm above, and uses javascript to populate and submit the form.
-		3. This player is written in PHP, and includes the Square and Board classes for your convenience.
+		3. This player is written in PHP, and includes some PHP classes for your convenience.
 		4. You can use those classes as is, modify them, or throw them out completely.
 		5. Your process only needs to post the appropriate information, by whatever means you choose.
 		6. When you register your Bot (before you start developing), you'll give me a url to post to.

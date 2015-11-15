@@ -6,22 +6,20 @@ require 'bFunctions.php';
 $id = $_POST["id"];
 $nm = $_POST["nm"];
 $ac = $_POST["ac"];
-
+$buts = null;
 $registered = false;
 if ($id == "")
 {
 	echo '<script> alert("Sign in to play games. Thanks!"); window.location = "../Menu"; </script>';
 }
 // Step2: get list of human players from XML
-$players = HumansFromXML();
+$players = playersFromXML("humans.xml");
 // Step3: if R, register new player; otherwise, match player to their xml entry
 if ("R" == $ac)
 {
-	$player = new bPlayer();
-	$player->setID($id);
-	$player->setName($nm);
+	$player = makePlayer($id, $nm);
 	$players[count($players)] = $player;
-	writeHumanXML($players);
+	writePlayerXML($players, "humans.xml");
 	$registered = true;
 }
 else
@@ -35,11 +33,13 @@ if ($player == null)
 else
 {
 	$registered = true;
-	$registerPlayer = $player->getName();
+	$registerPlayer = $player->name;
+	if ($player->ID == '106932376942135580175')
+	{
+		$registerPlayer = $registerPlayer.'<input type="button" style="background: #CC0033" onClick="admin();" value="admin">';
+	}	
 }
-$bots = BotsFromXML();
-$games = getGames($id);
-//print_r($games);
+$bots = playersFromXML("bots.xml");
 ?>
 <html>
 <head>
@@ -68,46 +68,10 @@ var strings = [];
 var rels = [];
 <?php
 echo 'var selectedGame = '.$selectedGame.'; ';
-if (count($games) > 0)
-{	
-	foreach ($games as $g)
-	{
-		echo 'strings['.$g->getPassKey().'] = "'.$g->Status.'"; ';
-		echo 'names['.$g->getPassKey().'] = []; ';
-		echo 'names['.$g->getPassKey().'][0] = "'.$g->Name1.'"; ';
-		echo 'names['.$g->getPassKey().'][1] = "'.$g->Name2.'"; ';
-		echo 'rels['.$g->getPassKey().'] = '.$g->getRel($id).'; ';
-//	echo 'actor = '.$g->getActor().'; ';
-		$buttonString = '<input type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
-		if ("C" == $g->getStage())
-		{
-			if  ($g->getRel($id) == 1)
-			{	
-				$buttonString = '<input style=\'background: #FF3399\' type=button onClick=acceptGame('.$g->getPassKey().'); value=Accept>';
-			}
-			else if ($g->getRel($id) == 0)
-			{
-				$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
-			}	
-		}
-		else if ($g->getRel($id) == 2 || $g->getStage() == "O")
-		{
-			$buttonString = '<input style=\'background: #CCCCFF\' type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
-		}
-		else if ($g->getRel($id) == $g->getActor())
-		{
-			$buttonString = '<input style=\'background: #33CC33\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
-		}
-		else
-		{
-			$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
-		}
-		echo 'gameButtons['.$g->getPassKey().'] = "'.$buttonString.'"; ';
-		$buts[$g->getPassKey()] = $buttonString;
-	}
-}
+$games = getGames($id);
+processGames($games);
 ?>		
-	</script>
+</script>
 </head>
 <body>
 <table border="0" width="100%" align="center"><tr>	
@@ -122,64 +86,73 @@ if (count($games) > 0)
 		<input type="hidden" name="nm" value="<?php echo $nm; ?>">
 		<input type="submit" style="background: #6666FF" value="ToMarGames Menu">
 	</form>
+	<form name="statForm" action="page2.php" method="post">			
+		<input type="hidden" name="id" value="<?php echo $id; ?>">
+		<input type="hidden" name="nm" value="<?php echo $nm; ?>">
+		<input type="submit" style="background: #7777FF" value="History">
+	</form>
 	<br>
 	<table border=1>
 		<tr><td colspan="5" class="magentah">Games</td></tr>
-<?php
-	if (count($games) > 0)
-	{	
-		foreach ($games as $g)
-		{
-			if ($g->getPassKey() == $selectedGame)
-			{	
-				$playButton = "";
-			}	
-			else
-			{	
-				$playButton = $buts[$g->getPassKey()];
-			}		
-			echo "<tr><td class='green10'>".$g->Name1."</td><td class='green10'>".$g->Name2."</td><td class='green10'>".$g->getStage()."</td><td id=".$g->getPassKey().">".$playButton."</td></tr>";
-		}	
-	}	
-?>	
+<?php displayGames($games); ?>	
 	</table>	
 	<br><br>
 	<table border=1>
-		<tr><td colspan="4" class="magentah">Human Players</td></tr>
+		<tr>
+			<td class="magentah">Human Players</td>
+			<td class="magentah">Games</td>
+			<td class="magentah">Wins</td>	
+			<td class="magentah"></td>	
+		</tr>
 <?php
 	foreach ($players as $p)
 	{
-		if ($registered == true && $p->getID() != $player->getID())
+		if ($registered == true && $p->ID != $player->ID)
 		{
-				$tId = "'".$p->getId()."'";
-				$tName = "'".$p->getName()."'";
+				$tId = "'".$p->ID."'";
+				$tName = "'".$p->name."'";
 				$playButton = '<input type="button" style="background: #6666FF" onClick="startGame('.$tId.','.$tName.');" value="Challenge">';
 		}
 		else 
 		{
 			$playButton = "";
 		}	
-		echo "<tr><td class='green10'>".$p->getName()."</td><td>".$playButton."</td></tr>";
+		echo "<tr>";
+		echo "<td class='green10'>".$p->name."</td>";
+		echo "<td class='green10'>".$p->gameCount."</td>";
+		echo "<td class='green10'>".$p->winCount."</td>";
+		echo "<td>".$playButton."</td>";
+		echo "</tr>";
 	}	
 ?>	
 	</table>	
 	<br><br>
 	<table border=1>
-		<tr><td colspan="4" class="magentah">Bot Players</td></tr>
+		<tr>
+			<td class="magentah">Bot Players</td>
+			<td class="magentah">Games</td>
+			<td class="magentah">Wins</td>	
+			<td class="magentah"></td>	
+		</tr>
 <?php
 	foreach ($bots as $p)
 	{
 		$playButton = "";
 		if ($player != null)
 		{	
-			if ($p->getDev() == null || $p->getDev() == $player->getID())
+			if ($p->dev == null || $p->dev == $player->ID)
 			{
-				$tId = "'".$p->getId()."'";
-				$tName = "'".$p->getName()."'";
+				$tId = "'".$p->ID."'";
+				$tName = "'".$p->name."'";
 				$playButton = '<input type="button" style="background: #6666FF" onClick="startGame('.$tId.','.$tName.');" value="Start Game">';
+				echo "<tr>";
+				echo "<td class='green10'>".$p->name."</td>";
+				echo "<td class='green10'>".$p->gameCount."</td>";
+				echo "<td class='green10'>".$p->winCount."</td>";
+				echo "<td>".$playButton."</td>";
+				echo "</tr>";
 			}
 		}		
-		echo "<tr><td class='green10'>".$p->getName()."</td><td>".$playButton."</td></tr>";
 	}	
 ?>	
 	</table>	
@@ -211,6 +184,79 @@ if (count($games) > 0)
 if ($selectedGame != "''")
 {
 	echo 'populateDisplay('.$selectedGame.'); ';
+}	
+if ($player->ID == '106932376942135580175')
+{
+?>
+function admin()
+{
+	if (window.confirm("Go to admin page?") == true) 
+	{
+		document.reloadForm.action = "admin.php";
+		document.reloadForm.submit();
+	}
+}	
+<?php	
+}
+function displayGames($gArray)
+{
+	global $buts, $selectedGame;
+	if (count($gArray) > 0)
+	{	
+		foreach ($gArray as $g)
+		{
+			if ($g->getPassKey() == $selectedGame)
+			{	
+				$playButton = "";
+			}	
+			else
+			{	
+				$playButton = $buts[$g->getPassKey()];
+			}		
+			echo "<tr><td class='green10'>".$g->Name1."</td><td class='green10'>".$g->Name2."</td><td class='green10'>".gameDate($g->TSP)."</td><td id=".$g->getPassKey().">".$playButton."</td></tr>";
+		}	
+	}
+}	
+function processGames($gArray)
+{
+	global $buts, $id;
+	if (count($gArray) > 0)
+	{	
+		foreach ($gArray as $g)
+		{
+			echo 'strings['.$g->getPassKey().'] = "'.$g->Status.'"; ';
+			echo 'names['.$g->getPassKey().'] = []; ';
+			echo 'names['.$g->getPassKey().'][0] = "'.$g->Name1.'"; ';
+			echo 'names['.$g->getPassKey().'][1] = "'.$g->Name2.'"; ';
+			echo 'rels['.$g->getPassKey().'] = '.$g->getRel($id).'; ';
+			$buttonString = '<input type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
+			if ("C" == $g->getStage())
+			{
+				if  ($g->getRel($id) == 1)
+				{	
+					$buttonString = '<input style=\'background: #FF3399\' type=button onClick=acceptGame('.$g->getPassKey().'); value=Accept>';
+				}
+				else if ($g->getRel($id) == 0)
+				{
+					$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
+				}	
+			}
+			else if ($g->getRel($id) == 2 || $g->getStage() == "O")
+			{
+				$buttonString = '<input style=\'background: #CCCCFF\' type=button onClick=selectGame('.$g->getPassKey().'); value=View>';
+			}
+			else if ($g->getRel($id) == $g->getActor())
+			{
+				$buttonString = '<input style=\'background: #33CC33\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
+			}
+			else
+			{
+				$buttonString = '<input style=\'background: #6666FF\' type=button onClick=selectGame('.$g->getPassKey().'); value=Play>';
+			}
+			echo 'gameButtons['.$g->getPassKey().'] = "'.$buttonString.'"; ';
+			$buts[$g->getPassKey()] = $buttonString;
+		}
+	}
 }	
 ?>	
 function startGame(opp, name)

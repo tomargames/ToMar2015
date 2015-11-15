@@ -22,7 +22,7 @@ if ($ac == null)
 }
 else
 {
-	$games = gamesFromXML();
+	$games = gamesFromXML("A");
 	writeGameXML($games,"B");					// back up xml before run
 	if ($ac == "C")
 	{
@@ -185,8 +185,7 @@ else
 fclose($log);
 function validateShips($shipString)
 {
-	$board = new bBoard();
-	$board->createBoard();
+	$board = bBoard::makeBoard();
 	$charCounter = 0;
 	for ($s = 0; $s < 5; $s++)
 	{
